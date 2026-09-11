@@ -2225,13 +2225,35 @@ document.addEventListener('click',e=>{
 // INIT
 // ═══════════════════════════════════════════════════════════════════
 // GITHUB SYNC — saves/loads progress.json to the repository
+// Token is stored in localStorage only — never in the source file
 // ═══════════════════════════════════════════════════════════════════
-const GH_TOKEN  = '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';
+const GH_TOKEN_KEY = 'cq_gh_token';
 const GH_OWNER  = 'anderson12341645';
 const GH_REPO   = 'StudySystem';
 const GH_FILE   = 'progress.json';
 const GH_API    = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
 const SYNC_TS_KEY = 'cq_last_sync';
+
+function getGHToken(){
+  return localStorage.getItem(GH_TOKEN_KEY)||'';
+}
+
+function promptForToken(){
+  const existing = getGHToken();
+  const t = prompt(
+    'Cole aqui seu GitHub Personal Access Token:\n\n' +
+    '(github.com → Settings → Developer settings\n → Personal access tokens → Tokens classic)\n\n' +
+    'O token fica salvo só neste dispositivo.',
+    existing
+  );
+  if(!t) return existing||null;
+  if(t.trim().startsWith('ghp_')){
+    localStorage.setItem(GH_TOKEN_KEY, t.trim());
+    return t.trim();
+  }
+  showToast('❌ Token inválido — deve começar com ghp_');
+  return null;
+}
 
 function setSyncBtn(state){
   const btn = document.getElementById('sync-btn');
@@ -2272,28 +2294,29 @@ function buildProgressPayload(){
 }
 
 async function pushToGitHub(payload){
+  const token = getGHToken();
+  if(!token) throw new Error('Token não configurado');
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-  // Check if file exists (need SHA to update)
   let sha = null;
   try{
-    const check = await fetch(GH_API, {headers:{Authorization:`token ${GH_TOKEN}`, Accept:'application/vnd.github.v3+json'}});
+    const check = await fetch(GH_API, {headers:{Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json'}});
     if(check.ok){ const d = await check.json(); sha = d.sha; }
   }catch(_){}
-
   const body = {message:`sync ${new Date().toISOString()}`, content};
   if(sha) body.sha = sha;
-
   const resp = await fetch(GH_API, {
     method:  'PUT',
-    headers: {Authorization:`token ${GH_TOKEN}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
+    headers: {Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
     body:    JSON.stringify(body)
   });
   if(!resp.ok){ const e = await resp.json(); throw new Error(e.message||resp.status); }
 }
 
 async function pullFromGitHub(){
+  const token = getGHToken();
+  if(!token) throw new Error('Token não configurado');
   const resp = await fetch(GH_API+'?t='+Date.now(), {
-    headers:{Authorization:`token ${GH_TOKEN}`, Accept:'application/vnd.github.v3+json'}
+    headers:{Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json'}
   });
   if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
   const d = await resp.json();
@@ -2324,7 +2347,13 @@ async function syncWithGitHub(){
   const btn = document.getElementById('sync-btn');
   if(btn) btn.disabled = true;
 
-  // Ask: push local → GitHub, or pull GitHub → local?
+  // Ensure token is available
+  let token = getGHToken();
+  if(!token){
+    token = promptForToken();
+    if(!token){ if(btn) btn.disabled=false; return; }
+  }
+
   const choice = confirm(
     'Sincronizar progresso com GitHub.\n\n' +
     'OK  = Salvar MEU progresso no GitHub (sobrescreve o que está lá)\n' +
@@ -2373,6 +2402,7 @@ async function syncWithGitHub(){
 // Auto-pull on load if we've never synced on this device
 async function autoSyncOnLoad(){
   if(localStorage.getItem(SYNC_TS_KEY)) return; // already synced before
+  if(!getGHToken()) return; // no token stored yet — user needs to set it manually first
   try{
     const payload = await pullFromGitHub();
     if(payload && payload.sr_data && Object.keys(payload.sr_data).length>0){
