@@ -2223,11 +2223,78 @@ document.addEventListener('click',e=>{
 // ═══════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════
+// AUTO-LOAD questions from GitHub on first open (empty bank)
+// ═══════════════════════════════════════════════════════════════════
+const GITHUB_BASE = 'https://anderson12341645.github.io/StudySystem/';
+const AUTO_LOAD_FILES = [
+  'transpetro_questoes_limpo.json',
+  'transpetro_basico_questoes_limpo.json'
+];
+const AUTO_LOADED_KEY = 'cq_auto_loaded_v1';
+
+async function autoLoadQuestions(){
+  // Only run once — if already loaded or user already has questions, skip
+  if(localStorage.getItem(AUTO_LOADED_KEY)) return;
+  if(loadQ().length > 3) return; // more than sample data = already loaded
+
+  const banner = document.createElement('div');
+  banner.id = 'auto-load-banner';
+  banner.style.cssText = [
+    'position:fixed','bottom:48px','left:50%','transform:translateX(-50%)',
+    'background:#1a2540','border:1px solid #3b82f6','color:#e8eaf0',
+    'padding:12px 20px','border-radius:10px','font-size:13px',
+    'z-index:8000','text-align:center','box-shadow:0 4px 20px rgba(0,0,0,.5)',
+    'min-width:260px'
+  ].join(';');
+  banner.innerHTML = '⏳ Carregando questões pela primeira vez...';
+  document.body.appendChild(banner);
+
+  let allQuestions = [];
+  let failed = false;
+
+  for(const file of AUTO_LOAD_FILES){
+    try{
+      const resp = await fetch(GITHUB_BASE + file);
+      if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      const arr  = Array.isArray(data) ? data : (data.questions || []);
+      allQuestions = allQuestions.concat(arr);
+      banner.innerHTML = `⏳ Carregando... ${allQuestions.length} questões`;
+    } catch(e){
+      console.warn('Auto-load failed for', file, e);
+      failed = true;
+    }
+  }
+
+  if(allQuestions.length > 0){
+    // Merge with any existing (replaces sample data)
+    const existing = loadQ();
+    const existingIds = new Set(existing.filter(q=>q.concurso!=='Exemplo — Demonstração').map(q=>q.id));
+    const merged = [
+      ...existing.filter(q=>q.concurso==='Exemplo — Demonstração'), // keep samples
+      ...allQuestions.filter(q=>!existingIds.has(q.id))
+    ];
+    // Actually just replace — user hasn't done anything yet
+    saveQ(allQuestions);
+    localStorage.setItem(AUTO_LOADED_KEY, '1');
+    banner.style.borderColor = '#10b981';
+    banner.innerHTML = `✅ ${allQuestions.length} questões carregadas automaticamente!`;
+    updateStatusBar();
+    updateEstSetup();
+  } else if(failed){
+    banner.style.borderColor = '#f59e0b';
+    banner.innerHTML = '⚠️ Não foi possível carregar questões automaticamente. Use Gestão → Importar.';
+  }
+
+  setTimeout(()=> banner.remove(), 4000);
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
   seedSampleData();
   updateStatusBar();
   updateEstSetup();
   renderRevHome();
+  autoLoadQuestions();
   // Init nav tabs
   document.querySelectorAll('.nav-tab').forEach(t=>{
     t.addEventListener('click',function(){
