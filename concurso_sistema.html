@@ -668,6 +668,7 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
   <div><span class="sb-dot" style="background:var(--green)"></span>Salvo automaticamente</div>
   <div id="sb-due" style="display:none"><span class="sb-dot" style="background:var(--amber)"></span><span id="sb-due-txt"></span></div>
   <div id="sb-total" style="margin-left:auto;font-size:11px;color:var(--text3)"></div>
+  <button id="sync-btn" onclick="syncWithGitHub()" style="margin-left:12px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:#93c5fd;font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;cursor:pointer;white-space:nowrap" title="Sincronizar progresso com GitHub">☁️ Sync</button>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2223,6 +2224,169 @@ document.addEventListener('click',e=>{
 // ═══════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════
+// GITHUB SYNC — saves/loads progress.json to the repository
+// ═══════════════════════════════════════════════════════════════════
+const GH_TOKEN  = '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';
+const GH_OWNER  = 'anderson12341645';
+const GH_REPO   = 'StudySystem';
+const GH_FILE   = 'progress.json';
+const GH_API    = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+const SYNC_TS_KEY = 'cq_last_sync';
+
+function setSyncBtn(state){
+  const btn = document.getElementById('sync-btn');
+  if(!btn) return;
+  const states = {
+    idle:    {text:'☁️ Sync',    color:'rgba(59,130,246,.15)', border:'rgba(59,130,246,.4)', textcol:'#93c5fd'},
+    saving:  {text:'⏳ Saving…', color:'rgba(245,158,11,.15)', border:'rgba(245,158,11,.4)', textcol:'#fcd34d'},
+    loading: {text:'⏳ Loading…',color:'rgba(245,158,11,.15)', border:'rgba(245,158,11,.4)', textcol:'#fcd34d'},
+    ok:      {text:'✅ Synced',  color:'rgba(16,185,129,.15)', border:'rgba(16,185,129,.4)', textcol:'#6ee7b7'},
+    err:     {text:'❌ Error',   color:'rgba(239,68,68,.15)',  border:'rgba(239,68,68,.4)',  textcol:'#fca5a5'},
+  };
+  const s = states[state] || states.idle;
+  btn.textContent = s.text;
+  btn.style.background   = s.color;
+  btn.style.borderColor  = s.border;
+  btn.style.color        = s.textcol;
+  if(state==='ok'||state==='err') setTimeout(()=>setSyncBtn('idle'), 3000);
+}
+
+// Build the progress payload — SR data + answered question IDs + streak
+// We deliberately exclude the full question bank (already on GitHub as JSON)
+// to keep progress.json small and fast.
+function buildProgressPayload(){
+  return {
+    version:    2,
+    saved_at:   new Date().toISOString(),
+    sr_data:    JSON.parse(localStorage.getItem(K_SR)    || '{}'),
+    streak:     JSON.parse(localStorage.getItem(K_STREAK)|| '{}'),
+    settings:   JSON.parse(localStorage.getItem(K_SETTINGS)||'{}'),
+    // Notes (text only — images stay in IndexedDB, too large for GitHub API)
+    notes: (()=>{
+      const qs = loadQ();
+      const notes = {};
+      qs.forEach(q=>{ if(q.nota_pessoal||q.nota_has_images) notes[q.id]={text:q.nota_pessoal||'',has_images:q.nota_has_images||false}; });
+      return notes;
+    })()
+  };
+}
+
+async function pushToGitHub(payload){
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+  // Check if file exists (need SHA to update)
+  let sha = null;
+  try{
+    const check = await fetch(GH_API, {headers:{Authorization:`token ${GH_TOKEN}`, Accept:'application/vnd.github.v3+json'}});
+    if(check.ok){ const d = await check.json(); sha = d.sha; }
+  }catch(_){}
+
+  const body = {message:`sync ${new Date().toISOString()}`, content};
+  if(sha) body.sha = sha;
+
+  const resp = await fetch(GH_API, {
+    method:  'PUT',
+    headers: {Authorization:`token ${GH_TOKEN}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
+    body:    JSON.stringify(body)
+  });
+  if(!resp.ok){ const e = await resp.json(); throw new Error(e.message||resp.status); }
+}
+
+async function pullFromGitHub(){
+  const resp = await fetch(GH_API+'?t='+Date.now(), {
+    headers:{Authorization:`token ${GH_TOKEN}`, Accept:'application/vnd.github.v3+json'}
+  });
+  if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const d = await resp.json();
+  const text = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+  return JSON.parse(text);
+}
+
+function applyProgress(payload){
+  if(payload.sr_data)  localStorage.setItem(K_SR,      JSON.stringify(payload.sr_data));
+  if(payload.streak)   localStorage.setItem(K_STREAK,  JSON.stringify(payload.streak));
+  if(payload.settings) localStorage.setItem(K_SETTINGS,JSON.stringify(payload.settings));
+  // Apply notes back to questions
+  if(payload.notes){
+    const qs = loadQ();
+    let changed = false;
+    qs.forEach(q=>{
+      if(payload.notes[q.id]){
+        q.nota_pessoal   = payload.notes[q.id].text || '';
+        q.nota_has_images= payload.notes[q.id].has_images || false;
+        changed = true;
+      }
+    });
+    if(changed) saveQ(qs);
+  }
+}
+
+async function syncWithGitHub(){
+  const btn = document.getElementById('sync-btn');
+  if(btn) btn.disabled = true;
+
+  // Ask: push local → GitHub, or pull GitHub → local?
+  const choice = confirm(
+    'Sincronizar progresso com GitHub.\n\n' +
+    'OK  = Salvar MEU progresso no GitHub (sobrescreve o que está lá)\n' +
+    'Cancelar = Carregar progresso DO GitHub para este dispositivo'
+  );
+
+  try{
+    if(choice){
+      // PUSH
+      setSyncBtn('saving');
+      const payload = buildProgressPayload();
+      await pushToGitHub(payload);
+      localStorage.setItem(SYNC_TS_KEY, new Date().toISOString());
+      setSyncBtn('ok');
+      showToast('☁️ Progresso salvo no GitHub!');
+    } else {
+      // PULL
+      setSyncBtn('loading');
+      const payload = await pullFromGitHub();
+      // Check if remote is newer
+      const localTs  = localStorage.getItem(SYNC_TS_KEY)||'';
+      const remoteTs = payload.saved_at||'';
+      if(localTs && remoteTs && localTs > remoteTs){
+        if(!confirm(`O progresso local (${localTs.slice(0,16)}) parece mais recente que o do GitHub (${remoteTs.slice(0,16)}). Substituir mesmo assim?`)){
+          setSyncBtn('idle');
+          if(btn) btn.disabled=false;
+          return;
+        }
+      }
+      applyProgress(payload);
+      localStorage.setItem(SYNC_TS_KEY, payload.saved_at||new Date().toISOString());
+      setSyncBtn('ok');
+      showToast('☁️ Progresso carregado do GitHub!');
+      updateStatusBar();
+      renderRevHome();
+      renderDashboard();
+    }
+  } catch(e){
+    setSyncBtn('err');
+    showToast('❌ Sync falhou: '+e.message);
+    console.error('GitHub sync error:', e);
+  }
+  if(btn) btn.disabled=false;
+}
+
+// Auto-pull on load if we've never synced on this device
+async function autoSyncOnLoad(){
+  if(localStorage.getItem(SYNC_TS_KEY)) return; // already synced before
+  try{
+    const payload = await pullFromGitHub();
+    if(payload && payload.sr_data && Object.keys(payload.sr_data).length>0){
+      applyProgress(payload);
+      localStorage.setItem(SYNC_TS_KEY, payload.saved_at||new Date().toISOString());
+      showToast('☁️ Progresso restaurado do GitHub!');
+      updateStatusBar();
+      renderRevHome();
+    }
+  } catch(_){ /* no progress.json yet — that's fine */ }
+}
+// ─────────────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════
 // AUTO-LOAD questions from GitHub on first open (empty bank)
 // ═══════════════════════════════════════════════════════════════════
 const GITHUB_BASE = 'https://anderson12341645.github.io/StudySystem/';
@@ -2295,6 +2459,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   updateEstSetup();
   renderRevHome();
   autoLoadQuestions();
+  autoSyncOnLoad();
   // Init nav tabs
   document.querySelectorAll('.nav-tab').forEach(t=>{
     t.addEventListener('click',function(){
