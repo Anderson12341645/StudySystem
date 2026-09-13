@@ -183,6 +183,28 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 /* FILTER ROW */
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .filter-row .form-control{flex:1;min-width:120px}
+/* MANGA MODULE */
+.manga-sidebar{width:220px;flex-shrink:0;border-right:1px solid var(--border);padding-right:16px}
+.manga-main{flex:1;min-width:0}
+.manga-layout{display:flex;gap:20px;min-height:400px}
+.manga-disc-item{padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;color:var(--text2);transition:background .15s;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.manga-disc-item:hover{background:var(--bg3)}
+.manga-disc-item.active{background:var(--blue-dim);color:var(--text);border-left:3px solid var(--blue);padding-left:7px}
+.manga-disc-item .manga-count{font-size:10px;color:var(--text3);background:var(--bg4);padding:1px 6px;border-radius:8px;flex-shrink:0}
+.manga-sub-item{padding:6px 10px 6px 20px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--text3);transition:background .15s;display:flex;align-items:center;justify-content:space-between}
+.manga-sub-item:hover{background:var(--bg3);color:var(--text2)}
+.manga-sub-item.active{color:var(--blue);font-weight:600}
+.manga-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:14px}
+.manga-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s}
+.manga-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.manga-card img{width:100%;height:200px;object-fit:cover;display:block}
+.manga-card-info{padding:8px 10px}
+.manga-card-name{font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.manga-card-sub{font-size:10px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.manga-add-area{border:2px dashed var(--border2);border-radius:var(--radius);padding:32px;text-align:center;color:var(--text3);cursor:pointer;transition:border-color .2s,color .2s;margin-top:14px}
+.manga-add-area:hover{border-color:var(--blue);color:var(--blue)}
+.manga-add-area input{display:none}
+@media(max-width:600px){.manga-layout{flex-direction:column}.manga-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:12px}}
 </style>
 </head>
 <body>
@@ -194,13 +216,14 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
     <button class="nav-tab" onclick="showMod('revisao')">🔁 Revisão</button>
     <button class="nav-tab" onclick="showMod('dashboard')">📊 Dashboard</button>
     <button class="nav-tab" onclick="showMod('simulado')">🧪 Simulado</button>
+    <button class="nav-tab" onclick="showMod('manga')">🖼️ Manga</button>
     <button class="nav-tab" onclick="showMod('gestao')">⚙️ Gestão</button>
   </div>
   <button class="btn btn-ghost btn-sm" onclick="openConfig()" style="margin-left:8px;flex-shrink:0">⚙ Config</button>
 </nav>
 
 <!-- CONFIG MODAL -->
-<div id="config-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center">
+<div id="config-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;pointer-events:none">
   <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:24px;width:100%;max-width:420px;margin:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div style="font-size:16px;font-weight:700">⚙ Configurações</div>
@@ -474,6 +497,57 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
     <div class="sl">Resultado do Simulado</div>
     <div id="sim-result-content"></div>
     <button class="btn btn-primary" onclick="resetSimulado()" style="margin-top:12px">Novo simulado</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ MANGA ═══ -->
+<div class="mod" id="mod-manga">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div style="font-size:16px;font-weight:700">🖼️ Manga — Teoria Visual</div>
+    <button class="btn btn-primary btn-sm" onclick="openMangaNewDisc()">+ Nova matéria</button>
+  </div>
+
+  <div class="manga-layout">
+    <!-- Sidebar: disciplines + sub-topics -->
+    <div class="manga-sidebar">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);letter-spacing:.5px;margin-bottom:8px">Matérias</div>
+      <div id="manga-disc-list">
+        <div class="empty" style="padding:20px 0;font-size:12px">Nenhuma matéria ainda.<br>Clique em "+ Nova matéria".</div>
+      </div>
+    </div>
+
+    <!-- Main: image grid -->
+    <div class="manga-main">
+      <div id="manga-main-header" style="margin-bottom:12px;display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:15px;font-weight:700" id="manga-main-title">—</div>
+            <div style="font-size:12px;color:var(--text3)" id="manga-main-sub">—</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="openMangaNewSub()">+ Sub-tópico</button>
+            <button class="btn btn-ghost btn-sm" onclick="renameMangaDisc()">✏️ Renomear</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteMangaDisc()">🗑 Apagar matéria</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="manga-img-grid" class="manga-grid"></div>
+
+      <!-- Upload drop zone -->
+      <label class="manga-add-area" id="manga-upload-area" style="display:none">
+        <div style="font-size:28px;margin-bottom:8px">🖼️</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px">Adicionar imagens de manga</div>
+        <div style="font-size:12px">Clique aqui ou arraste JPGs</div>
+        <input type="file" accept="image/*" multiple onchange="mangaUploadImages(this)">
+      </label>
+
+      <div id="manga-empty-state" class="empty" style="display:none">
+        <div class="empty-icon">🖼️</div>
+        <div class="empty-title">Selecione uma matéria</div>
+        <div class="empty-text">Escolha uma matéria na barra lateral para ver e adicionar imagens de manga.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1082,6 +1156,7 @@ function showMod(id){
   if(id==='gestao')renderGestao();
   if(id==='simulado')updateSimSetup();
   if(id==='estudar')updateEstSetup();
+  if(id==='manga')renderManga();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2188,9 +2263,12 @@ document.addEventListener('keydown',e=>{
 function openConfig(){
   const el=document.getElementById('config-overlay');
   el.style.display='flex';
+  el.style.pointerEvents='all';
 }
 function closeConfig(){
-  document.getElementById('config-overlay').style.display='none';
+  const el=document.getElementById('config-overlay');
+  el.style.display='none';
+  el.style.pointerEvents='none';
 }
 function confirmReset(type){
   if(type==='sr'){
@@ -2417,14 +2495,387 @@ async function autoSyncOnLoad(){
 // ─────────────────────────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════════════
+// MANGA MODULE — IndexedDB storage for visual study images
+// ═══════════════════════════════════════════════════════════════════
+const MANGA_DB_NAME  = 'cq_manga_db';
+const MANGA_DB_VER   = 1;
+const MANGA_META_KEY = 'cq_manga_meta'; // localStorage: array of {id, disc, sub, order}
+const MANGA_IMG_STORE = 'manga_images'; // IndexedDB: {key: id_idx, mangaId, idx, dataUrl, name}
+let _mangaDB = null;
+let mangaState = { discId: null, subId: null }; // currently selected
+
+// ── IndexedDB ──────────────────────────────────────────────────────
+function openMangaDB(){
+  return new Promise((res,rej)=>{
+    if(_mangaDB){res(_mangaDB);return;}
+    const req = indexedDB.open(MANGA_DB_NAME, MANGA_DB_VER);
+    req.onupgradeneeded = e=>{
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(MANGA_IMG_STORE))
+        db.createObjectStore(MANGA_IMG_STORE,{keyPath:'key'});
+    };
+    req.onsuccess = e=>{_mangaDB=e.target.result;res(_mangaDB);};
+    req.onerror   = e=>rej(e.target.error);
+  });
+}
+
+async function mangaGetImages(mangaId){
+  const db = await openMangaDB();
+  return new Promise(res=>{
+    const all=[], req=db.transaction(MANGA_IMG_STORE,'readonly').objectStore(MANGA_IMG_STORE).openCursor();
+    req.onsuccess = e=>{
+      const c=e.target.result;
+      if(c){if(c.value.mangaId===mangaId)all.push(c.value);c.continue();}
+      else{all.sort((a,b)=>a.idx-b.idx);res(all);}
+    };
+    req.onerror=()=>res([]);
+  });
+}
+
+async function mangaSaveImage(mangaId, dataUrl, name){
+  const db   = await openMangaDB();
+  const imgs = await mangaGetImages(mangaId);
+  const idx  = imgs.length>0?imgs[imgs.length-1].idx+1:0;
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(MANGA_IMG_STORE,'readwrite');
+    tx.objectStore(MANGA_IMG_STORE).put({key:`${mangaId}_${idx}`,mangaId,idx,dataUrl,name});
+    tx.oncomplete=()=>res(idx);tx.onerror=e=>rej(e.target.error);
+  });
+}
+
+async function mangaDeleteImage(mangaId, idx){
+  const db = await openMangaDB();
+  return new Promise(res=>{
+    const tx=db.transaction(MANGA_IMG_STORE,'readwrite');
+    tx.objectStore(MANGA_IMG_STORE).delete(`${mangaId}_${idx}`);
+    tx.oncomplete=res;
+  });
+}
+
+async function mangaDeleteAllImages(mangaId){
+  const imgs = await mangaGetImages(mangaId);
+  for(const img of imgs) await mangaDeleteImage(mangaId,img.idx);
+}
+
+// ── Metadata (localStorage) ────────────────────────────────────────
+// Structure: [{id, disc, sub, imgCount}]  where disc+sub define the tree
+function loadMangaMeta(){return JSON.parse(localStorage.getItem(MANGA_META_KEY)||'[]');}
+function saveMangaMeta(m){localStorage.setItem(MANGA_META_KEY,JSON.stringify(m));}
+
+// Get unique disciplines from meta
+function getMangaDiscs(){
+  const meta=loadMangaMeta();
+  const seen=new Set(),discs=[];
+  meta.forEach(m=>{if(!seen.has(m.disc)){seen.add(m.disc);discs.push(m.disc);}});
+  return discs;
+}
+// Get sub-topics for a discipline
+function getMangaSubs(disc){
+  return loadMangaMeta().filter(m=>m.disc===disc);
+}
+
+// ── Render sidebar ─────────────────────────────────────────────────
+function renderManga(){
+  const discs = getMangaDiscs();
+  const meta  = loadMangaMeta();
+  const list  = document.getElementById('manga-disc-list');
+  if(!list)return;
+
+  if(discs.length===0){
+    list.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0">Nenhuma matéria.<br>Clique em "+ Nova matéria".</div>';
+    document.getElementById('manga-empty-state').style.display='block';
+    document.getElementById('manga-main-header').style.display='none';
+    document.getElementById('manga-upload-area').style.display='none';
+    document.getElementById('manga-img-grid').innerHTML='';
+    return;
+  }
+
+  let html='';
+  discs.forEach(disc=>{
+    const subs  = getMangaSubs(disc);
+    const total = subs.reduce((a,s)=>a+(s.imgCount||0),0);
+    const isActive = subs.some(s=>s.id===mangaState.subId);
+    html+=`<div class="manga-disc-item${isActive?' active':''}" onclick="toggleMangaDisc('${escapeHtml(disc)}')">
+      <span>${escapeHtml(disc)}</span>
+      <span class="manga-count">${total}</span>
+    </div>`;
+    if(isActive){
+      subs.forEach(s=>{
+        html+=`<div class="manga-sub-item${s.id===mangaState.subId?' active':''}" onclick="selectMangaSub('${s.id}')">
+          <span>${escapeHtml(s.sub)}</span>
+          <span class="manga-count">${s.imgCount||0}</span>
+        </div>`;
+      });
+    }
+  });
+  list.innerHTML=html;
+
+  // If something is selected, render grid
+  if(mangaState.subId){
+    const entry=meta.find(m=>m.id===mangaState.subId);
+    if(entry) renderMangaGrid(entry);
+  } else {
+    document.getElementById('manga-empty-state').style.display='block';
+    document.getElementById('manga-main-header').style.display='none';
+    document.getElementById('manga-upload-area').style.display='none';
+    document.getElementById('manga-img-grid').innerHTML='';
+  }
+}
+
+function toggleMangaDisc(disc){
+  // If a sub from this disc is selected, deselect. Otherwise select first sub.
+  const subs=getMangaSubs(disc);
+  if(!subs.length)return;
+  const alreadyOpen=subs.some(s=>s.id===mangaState.subId);
+  if(alreadyOpen){mangaState.subId=null;mangaState.discId=null;}
+  else{mangaState.discId=disc;mangaState.subId=subs[0].id;}
+  renderManga();
+}
+
+function selectMangaSub(subId){
+  mangaState.subId=subId;
+  const entry=loadMangaMeta().find(m=>m.id===subId);
+  if(entry)mangaState.discId=entry.disc;
+  renderManga();
+}
+
+async function renderMangaGrid(entry){
+  document.getElementById('manga-empty-state').style.display='none';
+  document.getElementById('manga-main-header').style.display='flex';
+  document.getElementById('manga-upload-area').style.display='block';
+  document.getElementById('manga-main-title').textContent=entry.disc;
+  document.getElementById('manga-main-sub').textContent=entry.sub;
+
+  const imgs = await mangaGetImages(entry.id);
+  const grid = document.getElementById('manga-img-grid');
+
+  if(imgs.length===0){
+    grid.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:8px 0">Nenhuma imagem ainda. Clique na área abaixo para adicionar.</div>`;
+    return;
+  }
+
+  grid.innerHTML=imgs.map(img=>`
+    <div class="manga-card" id="mgcard-${img.idx}">
+      <img src="${img.dataUrl}" alt="${escapeHtml(img.name)}"
+           onclick="mangaOpenFull('${entry.id}',${img.idx})">
+      <div class="manga-card-info">
+        <div class="manga-card-name">${escapeHtml(img.name)}</div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn btn-ghost btn-sm" style="flex:1;font-size:11px" onclick="mangaOpenFull('${entry.id}',${img.idx})">🔍 Ver</button>
+          <button class="btn btn-danger btn-sm" style="font-size:11px" onclick="mangaDeleteImg('${entry.id}',${img.idx})">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Actions ────────────────────────────────────────────────────────
+function openMangaNewDisc(){
+  const disc=prompt('Nome da nova matéria:\n(ex: Direito Administrativo)');
+  if(!disc||!disc.trim())return;
+  const sub=prompt('Nome do primeiro sub-tópico:\n(ex: Princípios Constitucionais)');
+  if(!sub||!sub.trim())return;
+  const meta=loadMangaMeta();
+  const id='mg_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  meta.push({id,disc:disc.trim(),sub:sub.trim(),imgCount:0});
+  saveMangaMeta(meta);
+  mangaState.subId=id;mangaState.discId=disc.trim();
+  renderManga();
+  showToast('✅ Matéria criada!');
+}
+
+function openMangaNewSub(){
+  if(!mangaState.discId){showToast('Selecione uma matéria primeiro.');return;}
+  const sub=prompt(`Novo sub-tópico em "${mangaState.discId}":`);
+  if(!sub||!sub.trim())return;
+  const meta=loadMangaMeta();
+  const id='mg_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+  meta.push({id,disc:mangaState.discId,sub:sub.trim(),imgCount:0});
+  saveMangaMeta(meta);
+  mangaState.subId=id;
+  renderManga();
+  showToast('✅ Sub-tópico criado!');
+}
+
+function renameMangaDisc(){
+  if(!mangaState.subId)return;
+  const meta=loadMangaMeta();
+  const entry=meta.find(m=>m.id===mangaState.subId);
+  if(!entry)return;
+  const choice=confirm('Renomear:\nOK = Renomear sub-tópico\nCancelar = Renomear matéria inteira');
+  if(choice){
+    const n=prompt('Novo nome do sub-tópico:',entry.sub);
+    if(!n||!n.trim())return;
+    entry.sub=n.trim();
+  } else {
+    const n=prompt('Novo nome da matéria:',entry.disc);
+    if(!n||!n.trim())return;
+    const oldDisc=entry.disc;
+    meta.forEach(m=>{if(m.disc===oldDisc)m.disc=n.trim();});
+    mangaState.discId=n.trim();
+  }
+  saveMangaMeta(meta);
+  renderManga();
+}
+
+async function deleteMangaDisc(){
+  if(!mangaState.subId)return;
+  const meta=loadMangaMeta();
+  const entry=meta.find(m=>m.id===mangaState.subId);
+  if(!entry)return;
+  const choice=confirm(`Apagar apenas o sub-tópico "${entry.sub}"?\n\nOK = Apagar só este sub-tópico\nCancelar = Apagar a matéria "${entry.disc}" inteira`);
+  if(choice){
+    if(!confirm(`Apagar sub-tópico "${entry.sub}" e todas suas imagens?`))return;
+    await mangaDeleteAllImages(entry.id);
+    const newMeta=meta.filter(m=>m.id!==entry.id);
+    saveMangaMeta(newMeta);
+    mangaState.subId=null;
+  } else {
+    if(!confirm(`Apagar a matéria "${entry.disc}" e TODOS os seus sub-tópicos e imagens?`))return;
+    const toDelete=meta.filter(m=>m.disc===entry.disc);
+    for(const m of toDelete) await mangaDeleteAllImages(m.id);
+    saveMangaMeta(meta.filter(m=>m.disc!==entry.disc));
+    mangaState.subId=null;mangaState.discId=null;
+  }
+  renderManga();
+  showToast('🗑 Apagado.');
+}
+
+async function mangaUploadImages(input){
+  if(!mangaState.subId){showToast('Selecione um sub-tópico primeiro.');return;}
+  const files=Array.from(input.files);
+  if(!files.length)return;
+  showToast('⏳ Salvando imagens...');
+  for(const file of files){
+    const dataUrl=await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(file);});
+    await mangaSaveImage(mangaState.subId,dataUrl,file.name);
+  }
+  // Update count in meta
+  const meta=loadMangaMeta();
+  const entry=meta.find(m=>m.id===mangaState.subId);
+  if(entry){
+    const imgs=await mangaGetImages(mangaState.subId);
+    entry.imgCount=imgs.length;
+    saveMangaMeta(meta);
+  }
+  input.value='';
+  renderManga();
+  showToast(`🖼️ ${files.length} imagem(ns) adicionada(s)!`);
+}
+
+async function mangaDeleteImg(mangaId,idx){
+  if(!confirm('Remover esta imagem?'))return;
+  await mangaDeleteImage(mangaId,idx);
+  const meta=loadMangaMeta();
+  const entry=meta.find(m=>m.id===mangaId);
+  if(entry){const imgs=await mangaGetImages(mangaId);entry.imgCount=imgs.length;saveMangaMeta(meta);}
+  renderManga();
+  showToast('🗑 Imagem removida.');
+}
+
+async function mangaOpenFull(mangaId, startIdx){
+  const imgs = await mangaGetImages(mangaId);
+  if(!imgs.length)return;
+  let current = imgs.findIndex(i=>i.idx===startIdx);
+  if(current<0)current=0;
+
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;user-select:none';
+
+  const toolbar=document.createElement('div');
+  toolbar.style.cssText='position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,.6);z-index:2;gap:8px';
+
+  const navLeft=document.createElement('button');
+  navLeft.textContent='◀';
+  navLeft.style.cssText='background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;flex-shrink:0';
+
+  const counter=document.createElement('div');
+  counter.style.cssText='color:#aaa;font-size:13px;flex:1;text-align:center';
+
+  const navRight=document.createElement('button');
+  navRight.textContent='▶';
+  navRight.style.cssText='background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;flex-shrink:0';
+
+  const closeBtn=document.createElement('button');
+  closeBtn.textContent='✕';
+  closeBtn.style.cssText='background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;flex-shrink:0';
+  closeBtn.onclick=()=>ov.remove();
+
+  toolbar.append(navLeft,counter,navRight,closeBtn);
+
+  const hint=document.createElement('div');
+  hint.style.cssText='position:absolute;bottom:12px;left:50%;transform:translateX(-50%);color:#555;font-size:11px;z-index:2';
+  hint.textContent='scroll = zoom · arrastar = mover · duplo-clique = reset · ESC = fechar';
+
+  const img=document.createElement('img');
+  img.style.cssText='max-width:90vw;max-height:88vh;border-radius:6px;box-shadow:0 0 40px rgba(0,0,0,.8);transform-origin:center center;cursor:grab;position:relative;z-index:1';
+
+  ov.append(toolbar,hint,img);
+  document.body.appendChild(ov);
+
+  // zoom/pan state
+  let scale=1,tx=0,ty=0,dragging=false,lastX=0,lastY=0;
+  function applyT(){img.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;img.style.cursor=scale>1?(dragging?'grabbing':'grab'):'default';}
+
+  function loadImg(i){
+    current=((i%imgs.length)+imgs.length)%imgs.length;
+    img.src=imgs[current].dataUrl;
+    counter.textContent=`${imgs[current].name}  (${current+1} / ${imgs.length})`;
+    scale=1;tx=0;ty=0;applyT();
+  }
+  loadImg(current);
+
+  navLeft.onclick=()=>loadImg(current-1);
+  navRight.onclick=()=>loadImg(current+1);
+
+  ov.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const rect=img.getBoundingClientRect();
+    const ox=e.clientX-(rect.left+rect.width/2);
+    const oy=e.clientY-(rect.top+rect.height/2);
+    const d=e.deltaY<0?1.15:1/1.15;
+    const ns=Math.min(8,Math.max(0.5,scale*d));
+    const r=ns/scale;tx=tx*r+ox*(1-r);ty=ty*r+oy*(1-r);scale=ns;applyT();
+  },{passive:false});
+
+  img.addEventListener('mousedown',e=>{if(scale<=1)return;dragging=true;lastX=e.clientX;lastY=e.clientY;e.preventDefault();});
+  window.addEventListener('mousemove',e=>{if(!dragging)return;tx+=e.clientX-lastX;ty+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;applyT();});
+  window.addEventListener('mouseup',()=>{dragging=false;applyT();});
+  img.addEventListener('dblclick',()=>{scale=1;tx=0;ty=0;applyT();});
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+
+  // Touch pinch+drag
+  let ltd=null,ltm=null;
+  ov.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){const[a,b]=e.touches;ltd=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);ltm={x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2};}
+    else if(e.touches.length===1){dragging=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;}
+    e.preventDefault();
+  },{passive:false});
+  ov.addEventListener('touchmove',e=>{
+    if(e.touches.length===2){const[a,b]=e.touches;const d=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);const m={x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2};
+      if(ltd){const r2=Math.min(8,Math.max(0.5,scale*(d/ltd)))/scale;const rect=img.getBoundingClientRect();const ox=m.x-(rect.left+rect.width/2);const oy=m.y-(rect.top+rect.height/2);tx=tx*r2+ox*(1-r2)+(m.x-ltm.x);ty=ty*r2+oy*(1-r2)+(m.y-ltm.y);scale=Math.min(8,Math.max(0.5,scale*(d/ltd)));applyT();}ltd=d;ltm=m;}
+    else if(e.touches.length===1&&dragging){tx+=e.touches[0].clientX-lastX;ty+=e.touches[0].clientY-lastY;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;applyT();}
+    e.preventDefault();
+  },{passive:false});
+  ov.addEventListener('touchend',()=>{dragging=false;ltd=null;ltm=null;});
+
+  function onKey(e){
+    if(e.key==='Escape'){ov.remove();window.removeEventListener('keydown',onKey);}
+    if(e.key==='ArrowRight')loadImg(current+1);
+    if(e.key==='ArrowLeft')loadImg(current-1);
+  }
+  window.addEventListener('keydown',onKey);
+}
+// ─────────────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════
 // AUTO-LOAD questions from GitHub on first open (empty bank)
 // ═══════════════════════════════════════════════════════════════════
 const GITHUB_BASE = 'https://anderson12341645.github.io/StudySystem/';
 const AUTO_LOAD_FILES = [
-  'transpetro_questoes_limpo.json',
-  'transpetro_basico_questoes_limpo.json'
+  'transpetro_basico_questoes_limpo.json',
+  'transpetro_eletrica_questoes_limpo.json'
 ];
-const AUTO_LOADED_KEY = 'cq_auto_loaded_v1';
+const AUTO_LOADED_KEY = 'cq_auto_loaded_v2';
 
 async function autoLoadQuestions(){
   // Only run once — if already loaded or user already has questions, skip
