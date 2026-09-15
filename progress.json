@@ -1,8 +1,44 @@
 {
   "version": 2,
-  "saved_at": "2026-09-13T20:53:18.743Z",
-  "sr_data": {},
+  "saved_at": "2026-09-15T17:28:42.603Z",
+  "sr_data": {
+    "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
+      "interval_index": 0,
+      "next_due": "2026-09-16",
+      "last_result": "unsure_correct",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-15",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        }
+      ]
+    },
+    "dd51f798-f524-44ce-94e4-ad572d95b38d": {
+      "interval_index": 0,
+      "next_due": "2026-09-16",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-15",
+          "result": "wrong",
+          "confidence": "unsure",
+          "correct": false
+        }
+      ]
+    }
+  },
   "streak": {},
   "settings": {},
-  "notes": {}
+  "notes": {
+    "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
+      "text": "As duas grandezas de tensão que existem num sistema trifásico\n\nTensão de fase (Vf): é a tensão medida entre um fio de fase e o neutro (ou entre uma fase e o \"centro\" do sistema, no caso de ligação em estrela). É a tensão \"individual\" de cada uma das três fases.\n\nTensão de linha (VL): é a tensão medida entre dois fios de fase diferentes (fase A e fase B, por exemplo, sem envolver o neutro).",
+      "has_images": false
+    }
+  }
 }
