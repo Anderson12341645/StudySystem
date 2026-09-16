@@ -1,16 +1,22 @@
 {
   "version": 2,
-  "saved_at": "2026-09-15T17:28:42.603Z",
+  "saved_at": "2026-09-16T17:09:31.802Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 0,
-      "next_due": "2026-09-16",
+      "next_due": "2026-09-17",
       "last_result": "unsure_correct",
       "confident_correct": 0,
-      "total_attempts": 1,
+      "total_attempts": 2,
       "history": [
         {
           "date": "2026-09-15",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        },
+        {
+          "date": "2026-09-16",
           "result": "unsure_correct",
           "confidence": "unsure",
           "correct": true
@@ -18,14 +24,140 @@
       ]
     },
     "dd51f798-f524-44ce-94e4-ad572d95b38d": {
+      "interval_index": 4,
+      "next_due": "2026-10-16",
+      "last_result": "confident_correct",
+      "confident_correct": 1,
+      "total_attempts": 2,
+      "history": [
+        {
+          "date": "2026-09-15",
+          "result": "wrong",
+          "confidence": "unsure",
+          "correct": false
+        },
+        {
+          "date": "2026-09-16",
+          "result": "confident_correct",
+          "confidence": "certain",
+          "correct": true
+        }
+      ]
+    },
+    "499bafe1-e5c5-4f9f-ba60-76fc0aa0fd62": {
       "interval_index": 0,
-      "next_due": "2026-09-16",
+      "next_due": "2026-09-17",
       "last_result": "wrong",
       "confident_correct": 0,
       "total_attempts": 1,
       "history": [
         {
-          "date": "2026-09-15",
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "unsure",
+          "correct": false
+        }
+      ]
+    },
+    "55efc83d-5b27-48e6-a510-25ce6a5dee54": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "unsure_correct",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        }
+      ]
+    },
+    "cd49d669-026a-43d8-8621-696f7204d9f8": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "unsure",
+          "correct": false
+        }
+      ]
+    },
+    "a38b6dd2-453d-4b54-807a-bcacb33c45f6": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "unsure_correct",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        }
+      ]
+    },
+    "3ea8f50f-ccf3-44ec-ba9b-8fcd86f9f708": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "unsure_correct",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        }
+      ]
+    },
+    "07346f18-1200-445f-9890-eec78658af75": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "03639e18-f38c-4a3f-844b-715696d938f7": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "unsure",
+          "correct": false
+        }
+      ]
+    },
+    "0feae0ee-d415-46a8-a526-a5d0b7e43b80": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
           "result": "wrong",
           "confidence": "unsure",
           "correct": false
@@ -38,6 +170,10 @@
   "notes": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "text": "As duas grandezas de tensão que existem num sistema trifásico\n\nTensão de fase (Vf): é a tensão medida entre um fio de fase e o neutro (ou entre uma fase e o \"centro\" do sistema, no caso de ligação em estrela). É a tensão \"individual\" de cada uma das três fases.\n\nTensão de linha (VL): é a tensão medida entre dois fios de fase diferentes (fase A e fase B, por exemplo, sem envolver o neutro).",
+      "has_images": false
+    },
+    "55efc83d-5b27-48e6-a510-25ce6a5dee54": {
+      "text": "Como V_L = \\sqrt{3} \\cdot V_F, o sistema disponibiliza dois níveis de tensão operacionais na mesma rede. Por exemplo:\n​Em uma rede 380/220\\text{ V}, podemos ligar cargas monofásicas de 220\\text{ V} (entre Fase e Neutro) e cargas trifásicas ou bifásicas de 380\\text{ V} (entre Fases).",
       "has_images": false
     }
   }
