@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-16T17:09:31.802Z",
+  "saved_at": "2026-09-16T18:40:17.101Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 0,
@@ -163,6 +163,156 @@
           "correct": false
         }
       ]
+    },
+    "bc7ec460-df60-444c-87c9-2c39e25acbd4": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "8668cece-d165-4f4b-829f-c6eaeba5ea47": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "fa22c9bf-5a76-47b9-91a0-59f55aed40e0": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "unsure_correct",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        }
+      ]
+    },
+    "a0397c11-b205-42ef-90c6-dec58cc48e9c": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "fc061fb3-3fc2-490b-932b-5987fb3076f8": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "165a9cb1-1286-422d-be4d-9443dabcb7d0": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": true
+        }
+      ]
+    },
+    "32299a4d-e0f4-4462-bcc5-06468aeab7e6": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "d68e98d3-2e66-46e6-8096-d74926822891": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "b90c402d-62be-41ec-95e5-4bca074cb796": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": true
+        }
+      ]
+    },
+    "7387124d-4da8-4077-8ec4-6afa2a0fa02b": {
+      "interval_index": 0,
+      "next_due": "2026-09-17",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-16",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": true
+        }
+      ]
     }
   },
   "streak": {},
@@ -174,6 +324,38 @@
     },
     "55efc83d-5b27-48e6-a510-25ce6a5dee54": {
       "text": "Como V_L = \\sqrt{3} \\cdot V_F, o sistema disponibiliza dois níveis de tensão operacionais na mesma rede. Por exemplo:\n​Em uma rede 380/220\\text{ V}, podemos ligar cargas monofásicas de 220\\text{ V} (entre Fase e Neutro) e cargas trifásicas ou bifásicas de 380\\text{ V} (entre Fases).",
+      "has_images": false
+    },
+    "8668cece-d165-4f4b-829f-c6eaeba5ea47": {
+      "text": "Tensão de Linha ($V_L$): É por definição a diferença de potencial (d.d.p.) entre duas FASES (Fase-Fase). Em tomada industrial trifásica de 380V, medir entre R e S (ou S e T, ou R e T) vai dar os 380V.\nModo VAC: Redes elétricas industriais/residenciais operam em Corrente Alternada (VAC - Volts Alternating Current).\n\nRegra de Ouro: NUNCA meça resistência ($\\Omega$) ou continuidade com o circuito energizado/ligado!",
+      "has_images": false
+    },
+    "fa22c9bf-5a76-47b9-91a0-59f55aed40e0": {
+      "text": "O Efeito Prático do \"Deslocamento\"\nComo o centro se moveu do lugar original:\n\nA distância entre o novo centro e a fase leve AUMENTA $\\rightarrow$ Acontece a sobretensão (queima equipamentos).\n\nA distância entre o novo centro e a fase pesada DIMINUI $\\rightarrow$ Acontece a subtensão (equipamentos fracos/desligando).\n\nPor isso o nome exato do fenômeno que a banca cobra é Deslocamento do Ponto Neutro (ou Neutro Flutuante).",
+      "has_images": false
+    },
+    "a0397c11-b205-42ef-90c6-dec58cc48e9c": {
+      "text": "Padrão Decorável para Concurso (Gabarito Automático)Para redes industriais comuns no Brasil, os pares em ligação Estrela são fixos:\nSe a Linha ($V_L$) é 380V $\\rightarrow$ a Fase ($V_F$) é 220V.\nSe a Linha ($V_L$) é 220V $\\rightarrow$ a Fase ($V_F$) é 127V.",
+      "has_images": false
+    },
+    "fc061fb3-3fc2-490b-932b-5987fb3076f8": {
+      "text": "Neutro e Terra no mesmo referencial: Em um sistema elétrico com neutro aterrado (como o esquema TN-S ou TN-C-S recomendado pela NBR 5410), o condutor de neutro e o condutor de proteção (Terra/PE) são ligados ao mesmo eletrodo de aterramento na entrada da instalação.Diferença de Potencial (d.d.p.): \nComo os dois barramentos estão conectados à mesma referência de terra ($0\\text{V}$ ideal), a diferença de potencial elétrica entre eles deve ser teoricamente zero volts.\n\nMacete Prático de ProvaEntre Fase e Neutro: \nTensão de Fase ($V_F \\rightarrow 127\\text{V}$ ou $220\\text{V}$)\nEntre Fase e Terra: Tensão de Fase ($V_F \\rightarrow 127\\text{V}$ ou $220\\text{V}$)\nEntre Fase e Fase: Tensão de Linha ($V_L \\rightarrow 220\\text{V}$ ou $380\\text{V}$)\nEntre Neutro e Terra: $\\approx 0\\text{V}$ (Ambos são referência de $0\\text{V}$)",
+      "has_images": false
+    },
+    "165a9cb1-1286-422d-be4d-9443dabcb7d0": {
+      "text": "Pediu corrente no Triângulo ($\\Delta$)? Divide a linha por $1,732$ para achar a fase.\nPediu tensão na Estrela (Y)? Divide a linha por $1,732$ para achar a fase.",
+      "has_images": false
+    },
+    "32299a4d-e0f4-4462-bcc5-06468aeab7e6": {
+      "text": "O Conceito Teórico Harmônicas de 3ª Ordem (e múltiplos: 9ª, 15ª...): São correntes geradas por cargas não lineares (computadores, inversores, lâmpadas LED). \nElas têm a característica de estar em fase entre si (sequência zero).O \"Trap\" do Triângulo ($\\Delta$): Como as 3 bobinas formam um circuito fechado em malha, as correntes de 3ª ordem rodam em círculo apenas dentro do triângulo (recirculam no enrolamento).\nO Resultado: Elas não saem para a linha de transmissão/distribuição. O Triângulo funciona como um \"filtro natural\" que impede que o 3º harmônico se espalhe pela rede elétrica.",
+      "has_images": false
+    },
+    "d68e98d3-2e66-46e6-8096-d74926822891": {
+      "text": "O Conceito Teórico\nUm motor trifásico de 6 terminais possui 3 bobinas internas:\n\nBobina 1: Pontas 1 e 4\n\nBobina 2: Pontas 2 e 5\n\nBobina 3: Pontas 3 e 6\n\nPara ligar em Triângulo ($\\Delta$), você precisa conectar o fim de uma bobina ao início da próxima, fechando um anel elétrico:\nFim da Bobina 3 (6) com Início da Bobina 1 (1) ---> Ponta (1-6) ----> Entra Fase R\nFim da Bobina 1 (4) com Início da Bobina 2 (2) ---> Ponta (2-4) ---> Entra Fase S\nFim da Bobina 2 (5) com Início da Bobina 3 (3) ---> Ponta (3-5) ---> Entra Fase T",
+      "has_images": false
+    },
+    "7387124d-4da8-4077-8ec4-6afa2a0fa02b": {
+      "text": "O que significa 120° de defasagem?\nEm um sistema trifásico, as três fases (A, B e C) não empurram ao mesmo tempo. Elas são como 3 pessoas empurrando uma roda em 3 direções perfeitamente opostas e simétricas:\n\nFase A empurra para cima.\n\nFase B empurra para baixo e para a esquerda.\n\nFase C empurra para baixo e para a direita.\n\nO que acontece no Neutro?O cabo de Neutro é o ponto central onde as três forças se encontram.\nSe as três fases têm a mesma carga (mesma força, ex: $10\\text{ A}$ cada uma), a força de uma cancela exatamente a força das outras duas.\nO resultado desse \"cabo de guerra\" de 3 lados é que ninguém sai do lugar.Por isso, a corrente resultante no meio (no neutro) é zero amperes ($0\\text{ A}$).",
       "has_images": false
     }
   }
