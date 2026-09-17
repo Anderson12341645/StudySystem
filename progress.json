@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-16T18:47:10.147Z",
+  "saved_at": "2026-09-17T15:00:21.574Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 0,
@@ -313,6 +313,141 @@
           "correct": true
         }
       ]
+    },
+    "db1b1f21-db7f-472f-a525-69a7b6714d47": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "unsure_correct",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        }
+      ]
+    },
+    "f9de1244-0c45-4ac1-94a0-9e77a91341e7": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "unsure_correct",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        }
+      ]
+    },
+    "7c7d39ce-0929-4da3-b33e-b96b0a651376": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "unsure",
+          "correct": false
+        }
+      ]
+    },
+    "cdfc2ca8-20fd-4f57-b5eb-135594c060b9": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": true
+        }
+      ]
+    },
+    "7f5a8547-d2e0-4bf2-9145-3e7ca2d4bebb": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "unsure_correct",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "unsure_correct",
+          "confidence": "unsure",
+          "correct": true
+        }
+      ]
+    },
+    "9d900ff7-56ab-4fa6-b8fd-e9b378b97829": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": true
+        }
+      ]
+    },
+    "58cccb9a-a5f5-47f0-ba4d-9a473ff53e02": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "a3eaf100-dde2-4b33-93a2-85a95c3e6558": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "2e977898-1b37-41bd-bade-a1d2fdad124e": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
     }
   },
   "streak": {},
@@ -356,6 +491,34 @@
     },
     "7387124d-4da8-4077-8ec4-6afa2a0fa02b": {
       "text": "O que significa 120° de defasagem?\nEm um sistema trifásico, as três fases (A, B e C) não empurram ao mesmo tempo. Elas são como 3 pessoas empurrando uma roda em 3 direções perfeitamente opostas e simétricas:\n\nFase A empurra para cima.\n\nFase B empurra para baixo e para a esquerda.\n\nFase C empurra para baixo e para a direita.\n\nO que acontece no Neutro?O cabo de Neutro é o ponto central onde as três forças se encontram.\nSe as três fases têm a mesma carga (mesma força, ex: $10\\text{ A}$ cada uma), a força de uma cancela exatamente a força das outras duas.\nO resultado desse \"cabo de guerra\" de 3 lados é que ninguém sai do lugar.Por isso, a corrente resultante no meio (no neutro) é zero amperes ($0\\text{ A}$).",
+      "has_images": false
+    },
+    "db1b1f21-db7f-472f-a525-69a7b6714d47": {
+      "text": "Regra Geral: Cada circuito terminal deve possuir o seu próprio condutor neutro.\n\nPor que é proibido compartilhar?\nSobrecarga do Neutro: Se dois circuitos monofásicos compartilham o mesmo neutro, a corrente de retorno pode ultrapassar a capacidade do cabo, causando sobreaquecimento e risco de incêndio.\n\nRisco de Choque em Manutenção: Ao desligar o disjuntor de um circuito para manutenção, o eletricista pode achar que o neutro está \"morto\", mas ele continuará energizado pelo retorno do outro circuito ligado a ele.",
+      "has_images": false
+    },
+    "f9de1244-0c45-4ac1-94a0-9e77a91341e7": {
+      "text": "Separação de Iluminação e Tomadas (Item 9.5.2.2): Circuitos de iluminação devem ser independentes dos circuitos de tomadas de uso geral (TUG) e tomadas de uso específico (TUE).",
+      "has_images": false
+    },
+    "7c7d39ce-0929-4da3-b33e-b96b0a651376": {
+      "text": "Fontes Chaveadas geram 3º Harmônico: Equipamentos eletrônicos são cargas não lineares que deformam a onda senoidal, gerando correntes em frequências múltiplas da fundamental ($180 Hz, $540Hz, etc.).\n\nHarmônicos de Sequência Zero (Triplens): Os harmônicos de 3ª ordem (e seus múltiplos: 9º, 15º) possuem a particularidade de estarem em fase entre as três fases do sistema 0 de defasagem angular entre si).\n\nSoma no Neutro: Como não há defasagem de 120 para cancelar essas correntes (como ocorre na frequência fundamental de $60Hz), elas se somam aritmeticamente ao retornar pelo condutor de neutro:\n\nIsso faz com que o neutro conduza uma corrente muito elevada — às vezes superando a própria corrente das fases —, mesmo em sistemas com fases equilibradas.",
+      "has_images": false
+    },
+    "cdfc2ca8-20fd-4f57-b5eb-135594c060b9": {
+      "text": "Condutor Ativo: Pela norma NBR 5410, condutores ativos são aqueles destinados a transportar corrente elétrica em condições normais de operação. Isso inclui os condutores de Fase e o condutor Neutro.\n\nFunção do Neutro: Servir como caminho de retorno para a corrente e fornecer a referência de 0V para cargas monofásicas. Em sistemas desequilibrados, a corrente de desequilíbrio circula permanentemente pelo neutro.\n\nFunção do Terra (Proteção / PE): O condutor de proteção NÃO é um condutor ativo. Em condições normais de operação, não circula corrente por ele (corrente nula). Ele só conduz corrente temporariamente em situações de falha/defeito (ex: fuga de corrente para a carcaça) para secionar o circuito pela proteção (DR ou disjuntor).",
+      "has_images": false
+    },
+    "7f5a8547-d2e0-4bf2-9145-3e7ca2d4bebb": {
+      "text": "Fenômeno\nDesequilíbrio de Fases (> 10%) \nSurgimento de Sequência Negativa ---> Campo oposto (freio) ---> Sobreaquecimento e perda de vida útil.\nEfeito no Neutro \nAumento da corrente de retorno ---> Mais perdas por Efeito Joule.",
+      "has_images": false
+    },
+    "9d900ff7-56ab-4fa6-b8fd-e9b378b97829": {
+      "text": "Esquema IT - Primeira Falta à Terra \nContinuidade de Serviço - Não desarma o circuito na 1ª falta\nTensão da Fase em Falta (A) - Vai para Zero em relação à terra\nTensão das Fases Sadias (B e C) - Elevam-se para a Tensão de Linha ($V_L = V_F \\times \\sqrt{3}$)",
+      "has_images": false
+    },
+    "2e977898-1b37-41bd-bade-a1d2fdad124e": {
+      "text": "Sequência de Fases - Posição da Tensão de Linha (VL) em relação à Fase (VF)\nPositiva (ABC) (Padrão de prova) - ADIANTADA em +30° (Pensa: ABC = Adiantada)\nNegativa (ACB) - ATRASADA em -30°\n\nViu a palavra \"Linha\" e \"Estrela\"? Já puxa o número 30.\nViu \"Sequência Positiva\" ou \"ABC\"? Coloca o sinal de + (Adiantada).",
       "has_images": false
     }
   }
