@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-17T15:00:21.574Z",
+  "saved_at": "2026-09-17T23:01:07.667Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 0,
@@ -448,6 +448,51 @@
           "correct": false
         }
       ]
+    },
+    "cb7de0dc-bd66-4015-8018-297f9c4c04c3": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": true
+        }
+      ]
+    },
+    "7a676a71-c9e9-4331-a957-119950fce538": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": false
+        }
+      ]
+    },
+    "25550c2b-4a8d-4681-96d1-5dd156240bba": {
+      "interval_index": 0,
+      "next_due": "2026-09-18",
+      "last_result": "wrong",
+      "confident_correct": 0,
+      "total_attempts": 1,
+      "history": [
+        {
+          "date": "2026-09-17",
+          "result": "wrong",
+          "confidence": "chutei",
+          "correct": true
+        }
+      ]
     }
   },
   "streak": {},
@@ -520,6 +565,14 @@
     "2e977898-1b37-41bd-bade-a1d2fdad124e": {
       "text": "Sequência de Fases - Posição da Tensão de Linha (VL) em relação à Fase (VF)\nPositiva (ABC) (Padrão de prova) - ADIANTADA em +30° (Pensa: ABC = Adiantada)\nNegativa (ACB) - ATRASADA em -30°\n\nViu a palavra \"Linha\" e \"Estrela\"? Já puxa o número 30.\nViu \"Sequência Positiva\" ou \"ABC\"? Coloca o sinal de + (Adiantada).",
       "has_images": false
+    },
+    "cb7de0dc-bd66-4015-8018-297f9c4c04c3": {
+      "text": "",
+      "has_images": true
+    },
+    "7a676a71-c9e9-4331-a957-119950fce538": {
+      "text": "",
+      "has_images": true
     }
   }
 }
