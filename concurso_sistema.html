@@ -1481,7 +1481,7 @@ function startEstudar(){
   const qtd=parseInt(document.getElementById('est-qtd')?.value||'0');
   if(qtd>0)qs=qs.slice(0,qtd);
 
-  estSession={qs,idx:0,selectedAlt:null,confidence:null,currentQ:null};
+  estSession={qs,idx:0,selectedAlt:null,confidence:null,currentQ:null,displayMap:{},origMap:{}};
   document.getElementById('est-setup').style.display='none';
   document.getElementById('est-done').style.display='none';
   document.getElementById('est-session').style.display='block';
@@ -1565,12 +1565,15 @@ function selectConfidence(conf){
 
 function revealEstGabarito(){
   const q=estSession.currentQ;
-  const selDisp=estSession.selectedAlt;         // display letter user clicked
+  const selDisp=estSession.selectedAlt;
   const conf=estSession.confidence;
-  const selOrig=estSession.displayMap[selDisp]; // original letter of their pick
-  const gabOrig=q.gabarito;                     // original correct letter (stored)
-  const gabDisp=estSession.origMap[gabOrig];    // where the correct answer appeared on screen
-  const isCorrect=selOrig===gabOrig;
+  // Use maps to convert display letters → original letters
+  const dMap = estSession.displayMap || {};
+  const oMap = estSession.origMap    || {};
+  const selOrig = dMap[selDisp] || selDisp;    // original letter the user picked
+  const gabOrig = q.gabarito;                  // original correct letter
+  const gabDisp = oMap[gabOrig] || gabOrig;    // display position of correct answer
+  const isCorrect = selOrig === gabOrig;
 
   // Style alternatives using display letters
   document.querySelectorAll('#est-alts .alt').forEach(a=>{
@@ -1762,10 +1765,12 @@ function revealRevGabarito(){
   const q=revSession.currentQ;
   const selDisp=revSession.selectedAlt;
   const conf=revSession.confidence;
-  const selOrig=revSession.displayMap[selDisp];
-  const gabOrig=q.gabarito;
-  const gabDisp=revSession.origMap[gabOrig];
-  const isCorrect=selOrig===gabOrig;
+  const dMap = revSession.displayMap || {};
+  const oMap = revSession.origMap    || {};
+  const selOrig = dMap[selDisp] || selDisp;
+  const gabOrig = q.gabarito;
+  const gabDisp = oMap[gabOrig] || gabOrig;
+  const isCorrect = selOrig === gabOrig;
 
   document.querySelectorAll('#rev-alts .alt').forEach(a=>{
     const dispL=a.querySelector('.alt-letter').textContent;
