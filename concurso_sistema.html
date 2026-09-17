@@ -760,6 +760,51 @@ function saveQ(d){localStorage.setItem(K_Q,JSON.stringify(d));updateStatusBar()}
 
 // ── Alt shuffling ────────────────────────────────────────────────────
 // Returns array of {display:'A', original:'C', text:'...'} in shuffled order
+
+// resolveGabarito: finds the true correct letter by matching explicacao_correta
+// against the alternativas text — fixes extraction errors where stored gabarito
+// letter is wrong but the explanation text is correct.
+function resolveGabarito(q){
+  const stored = q.gabarito;
+  if(!q.explicacao_correta || !q.alternativas) return stored;
+
+  const expl = q.explicacao_correta.toLowerCase().trim();
+
+  // Strategy 1: explanation starts with the alt text (common pattern in these PDFs)
+  // e.g. explicacao_correta = "Correta. O FTP é o protocolo..." and alt B = "O FTP..."
+  for(const [letter, text] of Object.entries(q.alternativas)){
+    if(!text) continue;
+    const altText = text.toLowerCase().trim();
+    // Check if the alt text appears at the start of the explanation
+    if(altText.length > 8 && expl.includes(altText.slice(0,20))){
+      return letter;
+    }
+  }
+
+  // Strategy 2: alt_expls has a "Check" marker for the correct one
+  if(q.explicacoes_alternativas){
+    for(const [letter, text] of Object.entries(q.explicacoes_alternativas)){
+      if(!text) continue;
+      const t = text.toLowerCase();
+      // The correct alt explanation often starts with "Correta." or "(Correta)"
+      if(t.startsWith('correta') || t.startsWith('(correta)')){
+        return letter;
+      }
+    }
+  }
+
+  // Strategy 3: check if stored gabarito letter's alt text appears in explanation
+  if(stored && q.alternativas[stored]){
+    const storedAlt = q.alternativas[stored].toLowerCase().trim();
+    if(storedAlt.length > 8 && expl.includes(storedAlt.slice(0,15))){
+      return stored; // stored is actually correct
+    }
+  }
+
+  // Fallback: trust stored gabarito
+  return stored;
+}
+
 function shuffleAlts(q){
   const letters = ['A','B','C','D','E'].filter(l=>q.alternativas[l]);
   // Fisher-Yates shuffle
@@ -1455,10 +1500,10 @@ function showEstQuestion(){
   estSession.currentQ=q;
   estSession.selectedAlt=null;
   estSession.confidence=null;
-  // Shuffle alternatives for this display (breaks position memorisation)
+  // Shuffle alternatives
   const {displayMap, origMap} = shuffleAlts(q);
-  estSession.displayMap = displayMap; // displayLetter → originalLetter
-  estSession.origMap    = origMap;    // originalLetter → displayLetter
+  estSession.displayMap = displayMap;
+  estSession.origMap    = origMap;
 
   document.getElementById('est-counter').textContent=`Questão ${idx+1} de ${qs.length}`;
   document.getElementById('est-progress').style.width=`${(idx/qs.length)*100}%`;
