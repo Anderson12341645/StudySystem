@@ -1569,22 +1569,41 @@ function startEstudar(){
   const today=todayStr();
   const diffOrder={facil:0,medio:1,dificil:2};
 
+  // Helper: SR priority group for a question
+  // 0 = due today (SR scheduled) — highest priority
+  // 1 = never answered
+  // 2 = answered before, not yet due
+  function srGroup(q){
+    const d=sr[q.id];
+    if(!d||!d.total_attempts) return 1; // never answered
+    if(d.next_due && dateStr(d.next_due)<=today) return 0; // due today
+    return 2; // not yet due
+  }
+
   if(ordem==='facil_primeiro'){
-    qs=[...qs].sort((a,b)=>(diffOrder[a.dificuldade]||0)-(diffOrder[b.dificuldade]||0));
+    qs=[...qs].sort((a,b)=>{
+      // SR group first (due today always first), then difficulty
+      const gDiff=srGroup(a)-srGroup(b);
+      if(gDiff!==0) return gDiff;
+      return (diffOrder[a.dificuldade]||0)-(diffOrder[b.dificuldade]||0);
+    });
   } else if(ordem==='aleatorio'){
-    qs=[...qs].sort(()=>Math.random()-.5);
+    // Still respect SR — due questions come before random new ones
+    const due=qs.filter(q=>srGroup(q)===0).sort(()=>Math.random()-.5);
+    const rest=qs.filter(q=>srGroup(q)!==0).sort(()=>Math.random()-.5);
+    qs=[...due,...rest];
   } else if(ordem==='erradas'){
     qs=[...qs].sort((a,b)=>{
-      // Atrasadas primeiro, depois por nº de erros
-      const aAtr=sr[a.id]?.next_due&&dateStr(sr[a.id].next_due)<=today?1:0;
-      const bAtr=sr[b.id]?.next_due&&dateStr(sr[b.id].next_due)<=today?1:0;
-      if(bAtr!==aAtr)return bAtr-aAtr;
+      const gDiff=srGroup(a)-srGroup(b);
+      if(gDiff!==0) return gDiff;
       const aErr=(sr[a.id]?.history||[]).filter(h=>!h.correct).length;
       const bErr=(sr[b.id]?.history||[]).filter(h=>!h.correct).length;
       return bErr-aErr;
     });
   } else if(ordem==='nunca'){
     qs=[...qs].sort((a,b)=>{
+      const gDiff=srGroup(a)-srGroup(b);
+      if(gDiff!==0) return gDiff;
       const aNever=!sr[a.id]||!sr[a.id].total_attempts?0:1;
       const bNever=!sr[b.id]||!sr[b.id].total_attempts?0:1;
       return aNever-bNever;
