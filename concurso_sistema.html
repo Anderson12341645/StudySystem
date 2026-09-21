@@ -1541,6 +1541,8 @@ function getEstCount(){
 
 function getFilteredQuestions(){
   const qs=loadQ();
+  const sr=loadSR();
+  const today=todayStr();
   const conc=document.getElementById('est-concurso')?.value||'';
   const disc=document.getElementById('est-disciplina')?.value||'';
   const sub=document.getElementById('est-subtopico')?.value||'';
@@ -1550,6 +1552,12 @@ function getFilteredQuestions(){
   if(disc)f=f.filter(q=>q.disciplina===disc);
   if(sub)f=f.filter(q=>q.subtopico===sub);
   if(diff)f=f.filter(q=>q.dificuldade===diff);
+  // Exclude questions already answered today — SR should handle when they come back
+  f=f.filter(q=>{
+    const d=sr[q.id];
+    if(!d||!d.last_answered) return true; // never answered → include
+    return dateStr(d.last_answered) < today;  // only include if last answer was before today
+  });
   return f;
 }
 
