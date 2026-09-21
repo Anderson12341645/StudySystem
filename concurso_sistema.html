@@ -1990,6 +1990,16 @@ function renderDashboard(){
   });
 
   if(!html)html='<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Sem dados ainda</div><div class="empty-text">Responda questões no módulo Estudar para ver seu progresso aqui.</div></div>';
+
+  // 💎 Diamond badge — all subtopics with ≥5 attempts at ≥80%
+  if(checkDiamondBadge(filtered, sr)){
+    html = `<div class="achievement achievement-diamond">
+      <div class="achievement-icon">💎</div>
+      <div><div class="achievement-title">Mestre das Matérias!</div>
+      <div class="achievement-desc">Todas as matérias com ≥80% de conhecimento real. Você está pronto para a prova.</div></div>
+    </div>` + html;
+  }
+
   document.getElementById('dash-topics').innerHTML=html;
 }
 
