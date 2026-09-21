@@ -174,6 +174,14 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 .result-circle{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;margin:0 auto 16px;border:4px solid}
 .result-pct{font-size:26px;font-weight:800}
 .result-label{font-size:11px;color:var(--text3)}
+/* BADGES/ACHIEVEMENTS */
+.achievement{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--radius);border:1px solid;margin-top:12px;animation:achievePop .4s ease}
+.achievement-fire{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.4)}
+.achievement-diamond{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.5)}
+.achievement-icon{font-size:32px;flex-shrink:0}
+.achievement-title{font-size:15px;font-weight:700;color:var(--text)}
+.achievement-desc{font-size:12px;color:var(--text3);margin-top:2px}
+@keyframes achievePop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
 /* SEARCH */
 .search-box{display:flex;gap:8px;margin-bottom:12px}
 .search-box .form-control{flex:1}
@@ -753,7 +761,6 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 // STORAGE
 // ═══════════════════════════════════════════════════════════════════
 const K_Q='cq_questions', K_SR='cq_sr_data', K_SETTINGS='cq_settings', K_STREAK='cq_streak';
-const SR_INTERVALS=[1,3,7,15,30];
 
 function loadQ(){return JSON.parse(localStorage.getItem(K_Q)||'[]')}
 function saveQ(d){localStorage.setItem(K_Q,JSON.stringify(d));updateStatusBar()}
@@ -1228,92 +1235,164 @@ function updateStatusBar(){
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SR ENGINE
+// SR ENGINE — Scientifically-designed spaced repetition
 // ═══════════════════════════════════════════════════════════════════
+//
+// Interval progression per confidence+correctness:
+//
+//  State        | Wrong/Chutei  | Unsure+Correct | Confident+Correct
+//  -------------|---------------|----------------|------------------
+//  New (never)  |    D+1        |     D+1        |     D+3
+//  After D+1    |    D+1        |     D+3        |     D+7
+//  After D+3    |    D+1        |     D+7        |     D+15
+//  After D+7    |    D+1        |     D+7        |     D+30
+//  After D+15   |    D+1        |     D+15       |     D+30
+//  After D+30   |    D+1        |     D+30       |     D+60
+//
+// Key rules:
+//  1. A question answered TODAY cannot appear again today (session filter)
+//  2. Wrong always resets to D+1, never same-session
+//  3. Confident+correct on first answer → D+3 (not D+30)
+//  4. Must prove at D+3 and D+7 before reaching D+30+
+
+// SR state per question:
+// { step: 0-5, next_due: ISO date, last_answered: ISO date,
+//   total_attempts, confident_correct, history[] }
+
+const SR_STEPS = [
+  // [wrong_days, unsure_days, confident_days]
+  // step 0 = never answered / just reset
+  [1, 1, 3],
+  // step 1 = passed D+1
+  [1, 3, 7],
+  // step 2 = passed D+3
+  [1, 7, 15],
+  // step 3 = passed D+7
+  [1, 7, 30],
+  // step 4 = passed D+15
+  [1, 15, 30],
+  // step 5 = passed D+30 (mastered)
+  [1, 30, 60],
+];
+
 function getSRData(id){
   const sr=loadSR();
-  return sr[id]||{interval_index:-1,next_due:null,last_result:null,confident_correct:0,total_attempts:0,history:[]};
+  return sr[id]||{step:0,next_due:null,last_answered:null,total_attempts:0,confident_correct:0,history:[]};
 }
+
+function _applySR(id, confidence, isCorrect){
+  const sr  = loadSR();
+  if(!sr[id]) sr[id]={step:0,next_due:null,last_answered:null,total_attempts:0,confident_correct:0,history:[]};
+  const d   = sr[id];
+  const today = todayStr();
+
+  d.total_attempts++;
+  d.last_answered = today;
+
+  let newStep, days, srLabel, srClass;
+  const curStep = Math.min(d.step, SR_STEPS.length-1);
+  const [wrongDays, unsureDays, confDays] = SR_STEPS[curStep];
+
+  if(!isCorrect || confidence==='chutei'){
+    // Wrong or guessed → reset to step 0, D+1
+    newStep = 0;
+    days    = wrongDays;
+    d.last_result = 'wrong';
+    srLabel = `❌ ${!isCorrect?'Errada':'Chutou'} — revisão em ${days} dia(s)`;
+    srClass = 'sr-wrong';
+  } else if(confidence==='unsure'){
+    // Unsure+correct → stay at same step, advance conservatively
+    newStep = curStep; // don't advance step on unsure
+    days    = unsureDays;
+    d.last_result = 'unsure_correct';
+    srLabel = `⚠️ Acertou mas incerto — revisão em ${days} dia(s)`;
+    srClass = 'sr-unsure';
+  } else {
+    // Confident+correct → advance step
+    newStep = Math.min(curStep+1, SR_STEPS.length-1);
+    days    = confDays;
+    d.confident_correct++;
+    d.last_result = 'confident_correct';
+    const stepNames=['D+3','D+7','D+15','D+30','D+30','D+60'];
+    srLabel = `✅ Correto! Próxima revisão: ${stepNames[curStep]||'D+'+days}`;
+    srClass = 'sr-confident';
+  }
+
+  d.step     = newStep;
+  d.next_due = addDays(today, days);
+  d.history  = (d.history||[]).concat([{date:today, confidence, correct:isCorrect, step:curStep, newStep, days}]);
+  sr[id] = d;
+  saveSR(sr);
+  return {srLabel, srClass};
+}
+
+// Called from Estudar (first time seeing a question in this session)
 function updateSR(id, confidence, isCorrect){
-  const sr=loadSR();
-  if(!sr[id])sr[id]={interval_index:-1,next_due:null,last_result:null,confident_correct:0,total_attempts:0,history:[]};
-  const d=sr[id];
-  d.total_attempts++;
-  const today=todayStr();
-  let result, nextIdx, srLabel;
-
-  if(isCorrect && confidence==='certain'){
-    result='confident_correct';
-    d.confident_correct++;
-    // D+30 only
-    d.interval_index=4;
-    d.next_due=addDays(today,30);
-    srLabel='✅ Dominado — próxima revisão em 30 dias';
-    srClass='sr-confident';
-  } else if(isCorrect && confidence==='unsure'){
-    result='unsure_correct';
-    // Treat as wrong — full cycle from start
-    d.interval_index=0;
-    d.next_due=addDays(today,1);
-    srLabel='⚠️ Incerto — revisão amanhã (D+1)';
-    srClass='sr-unsure';
-  } else {
-    result='wrong';
-    d.interval_index=0;
-    d.next_due=addDays(today,1);
-    srLabel='❌ Errada — revisão amanhã (D+1)';
-    srClass='sr-wrong';
-  }
-  d.last_result=result;
-  d.history.push({date:today, result, confidence, correct:isCorrect});
-  sr[id]=d;
-  saveSR(sr);
-  return {srLabel, srClass};
+  return _applySR(id, confidence, isCorrect);
 }
-function advanceSR(id, confidence, isCorrect){
-  const sr=loadSR();
-  if(!sr[id])return updateSR(id,confidence,isCorrect);
-  const d=sr[id];
-  d.total_attempts++;
-  const today=todayStr();
-  let srLabel, srClass;
 
-  if(isCorrect && confidence==='certain'){
-    d.confident_correct++;
-    if(d.interval_index<SR_INTERVALS.length-1)d.interval_index++;
-    const days=SR_INTERVALS[d.interval_index];
-    d.next_due=addDays(today,days);
-    d.last_result='confident_correct';
-    srLabel=`✅ Correto! Próxima revisão em ${days} dias`;
-    srClass='sr-confident';
-  } else if(isCorrect && confidence==='unsure'){
-    d.interval_index=0;
-    d.next_due=addDays(today,1);
-    d.last_result='unsure_correct';
-    srLabel='⚠️ Acertou mas incerto — reiniciando ciclo (D+1)';
-    srClass='sr-unsure';
-  } else {
-    d.interval_index=0;
-    d.next_due=addDays(today,1);
-    d.last_result='wrong';
-    srLabel='❌ Errada — reiniciando ciclo (D+1)';
-    srClass='sr-wrong';
-  }
-  d.history.push({date:today, result:d.last_result, confidence, correct:isCorrect});
-  sr[id]=d;
-  saveSR(sr);
-  return {srLabel, srClass};
+// Called from Revisão (reviewing a scheduled question)
+function advanceSR(id, confidence, isCorrect){
+  return _applySR(id, confidence, isCorrect);
 }
 
 function getDueQuestions(){
-  const qs=loadQ();
-  const sr=loadSR();
-  const today=todayStr();
+  const qs    = loadQ();
+  const sr    = loadSR();
+  const today = todayStr();
   return qs.filter(q=>{
-    const d=sr[q.id];
-    return d && d.next_due && dateStr(d.next_due)<=today;
+    const d = sr[q.id];
+    if(!d || !d.next_due) return false;
+    // Must be due today or earlier
+    if(dateStr(d.next_due) > today) return false;
+    // CRITICAL: exclude questions answered TODAY — prevents same-session re-exposure
+    if(d.last_answered && dateStr(d.last_answered) >= today) return false;
+    return true;
   });
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// STREAK & ACHIEVEMENTS
+// ═══════════════════════════════════════════════════════════════════
+function loadStreak(){return JSON.parse(localStorage.getItem(K_STREAK)||'{"current":0,"best":0,"last_date":null,"today_count":0,"today_date":null}');}
+function saveStreak(s){localStorage.setItem(K_STREAK,JSON.stringify(s));}
+
+function recordQuestionAnswered(){
+  const s = loadStreak();
+  const today = todayStr();
+  if(s.today_date !== today){ s.today_count=0; s.today_date=today; }
+  s.today_count++;
+  if(s.today_count === 10){
+    const yesterday = addDays(today,-1);
+    if(s.last_date === yesterday){ s.current++; }
+    else if(s.last_date !== today){ s.current=1; }
+    s.last_date = today;
+    s.best = Math.max(s.best, s.current);
+  }
+  saveStreak(s);
+}
+
+function checkFireBadge(){ return loadStreak().current >= 7; }
+
+function checkDiamondBadge(filtered, sr){
+  if(!filtered||filtered.length===0) return false;
+  const subs={};
+  filtered.forEach(q=>{
+    const k=q.subtopico||q.disciplina;
+    if(!subs[k])subs[k]={conf:0,att:0};
+    const d=sr[q.id];
+    if(d){subs[k].att+=d.total_attempts||0;subs[k].conf+=d.confident_correct||0;}
+  });
+  const qualified=Object.values(subs).filter(s=>s.att>=5);
+  if(qualified.length===0) return false;
+  return qualified.every(s=>s.att>0&&Math.round((s.conf/s.att)*100)>=80);
+}
+
+function getTodayCount(){
+  const s=loadStreak(); const today=todayStr();
+  return (s.today_date===today)?s.today_count:0;
+}
+// ─────────────────────────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════════════
 // HELPER: DIFF BADGE
@@ -1570,10 +1649,13 @@ function revealEstGabarito(){
   // Use maps to convert display letters → original letters
   const dMap = estSession.displayMap || {};
   const oMap = estSession.origMap    || {};
-  const selOrig = dMap[selDisp] || selDisp;    // original letter the user picked
-  const gabOrig = q.gabarito;                  // original correct letter
-  const gabDisp = oMap[gabOrig] || gabOrig;    // display position of correct answer
+  const selOrig = dMap[selDisp] || selDisp;
+  const gabOrig = q.gabarito;
+  const gabDisp = oMap[gabOrig] || gabOrig;
   const isCorrect = selOrig === gabOrig;
+  // DEBUG — remove after testing
+  console.log('REVEAL EST | selDisp='+selDisp+' selOrig='+selOrig+' gabOrig='+gabOrig+' gabDisp='+gabDisp+' isCorrect='+isCorrect);
+  console.log('displayMap='+JSON.stringify(dMap)+' origMap='+JSON.stringify(oMap));
 
   // Style alternatives using display letters
   document.querySelectorAll('#est-alts .alt').forEach(a=>{
@@ -1616,6 +1698,7 @@ function revealEstGabarito(){
   // SR update — uses original letter correctness
   const {srLabel,srClass}=updateSR(q.id,conf,isCorrect);
   document.getElementById('est-sr-result').innerHTML=`<div class="sr-result ${srClass}">${srLabel}</div>`;
+  recordQuestionAnswered();
 
   document.getElementById('est-gabarito').style.display='block';
   updateStatusBar();
