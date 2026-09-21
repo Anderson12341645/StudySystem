@@ -1189,6 +1189,27 @@ async function clearNota(prefix, qId){
 function loadSR(){return JSON.parse(localStorage.getItem(K_SR)||'{}')}
 function saveSR(d){localStorage.setItem(K_SR,JSON.stringify(d))}
 
+// Migrate old SR data (interval_index → step) on first load
+function migrateSRData(){
+  const sr = loadSR();
+  let changed = false;
+  // Old interval sequence: [-1,0,1,2,3,4] → new steps [0,0,1,2,3,4,5]
+  const idxToStep = {'-1':0, '0':0, '1':1, '2':2, '3':3, '4':4};
+  Object.keys(sr).forEach(id=>{
+    const d = sr[id];
+    if(typeof d.interval_index !== 'undefined' && typeof d.step === 'undefined'){
+      d.step = idxToStep[String(d.interval_index)] || 0;
+      delete d.interval_index;
+      changed = true;
+    }
+    // Ensure last_answered exists
+    if(!d.last_answered && d.history && d.history.length > 0){
+      d.last_answered = d.history[d.history.length-1].date || null;
+    }
+  });
+  if(changed) saveSR(sr);
+}
+
 function getUID(){return crypto?.randomUUID?.()||Math.random().toString(36).slice(2)+Date.now().toString(36)}
 
 function todayStr(){return new Date().toISOString().slice(0,10)}
@@ -1448,7 +1469,14 @@ function updateEstPreview(){
 
   // Compute stats
   const total=qs.length;
-  const atrasadas=qs.filter(q=>{const d=sr[q.id];return d&&d.next_due&&dateStr(d.next_due)<=today;}).length;
+  const atrasadas=qs.filter(q=>{
+    const d=sr[q.id];
+    if(!d||!d.next_due) return false;
+    if(dateStr(d.next_due)>today) return false;
+    // Exclude answered today — same rule as getDueQuestions
+    if(d.last_answered && dateStr(d.last_answered)>=today) return false;
+    return true;
+  }).length;
   const nunca=qs.filter(q=>!sr[q.id]||!sr[q.id].total_attempts).length;
   const jaFeitas=total-nunca;
   const vaiEstudar=qtdSel>0?Math.min(qtdSel,total):total;
@@ -3090,6 +3118,7 @@ async function autoLoadQuestions(){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+  migrateSRData();
   seedSampleData();
   updateStatusBar();
   updateEstSetup();
