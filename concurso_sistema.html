@@ -1572,7 +1572,23 @@ function showEstQuestion(){
   if(idx>=qs.length){
     document.getElementById('est-session').style.display='none';
     document.getElementById('est-done').style.display='block';
-    document.getElementById('est-done-text').textContent=`Você respondeu ${qs.length} questão(ões) nesta sessão.`;
+    const todayCount = getTodayCount();
+    const streak = loadStreak();
+    const fireBadge = checkFireBadge();
+    let doneExtra = '';
+    if(fireBadge){
+      doneExtra = `<div class="achievement achievement-fire">
+        <div class="achievement-icon">🔥</div>
+        <div><div class="achievement-title">Sequência de ${streak.current} dias!</div>
+        <div class="achievement-desc">Você respondeu ≥10 questões por ${streak.current} dias seguidos. Continue assim!</div></div>
+      </div>`;
+    } else if(streak.current > 0){
+      const need = 10 - todayCount;
+      if(need > 0){
+        doneExtra = `<div style="margin-top:12px;font-size:12px;color:var(--text3)">🔥 Sequência atual: ${streak.current} dia(s) — faltam ${need} questões hoje para manter</div>`;
+      }
+    }
+    document.getElementById('est-done-text').innerHTML=`Você respondeu ${qs.length} questão(ões) nesta sessão.${doneExtra}`;
     return;
   }
   const q=qs[idx];
