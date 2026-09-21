@@ -1289,26 +1289,25 @@ function _applySR(id, confidence, isCorrect){
   d.total_attempts++;
   d.last_answered = today;
 
-  let newStep, days, srLabel, srClass;
-  const curStep = Math.min(d.step, SR_STEPS.length-1);
+  const curStep = Math.min(d.step||0, SR_STEPS.length-1);
   const [wrongDays, unsureDays, confDays] = SR_STEPS[curStep];
 
+  let newStep, days, srLabel, srClass;
+
   if(!isCorrect || confidence==='chutei'){
-    // Wrong or guessed → reset to step 0, D+1
     newStep = 0;
     days    = wrongDays;
     d.last_result = 'wrong';
     srLabel = `❌ ${!isCorrect?'Errada':'Chutou'} — revisão em ${days} dia(s)`;
     srClass = 'sr-wrong';
   } else if(confidence==='unsure'){
-    // Unsure+correct → stay at same step, advance conservatively
-    newStep = curStep; // don't advance step on unsure
+    newStep = curStep;
     days    = unsureDays;
     d.last_result = 'unsure_correct';
     srLabel = `⚠️ Acertou mas incerto — revisão em ${days} dia(s)`;
     srClass = 'sr-unsure';
   } else {
-    // Confident+correct → advance step
+    // confident + correct
     newStep = Math.min(curStep+1, SR_STEPS.length-1);
     days    = confDays;
     d.confident_correct++;
@@ -1669,9 +1668,6 @@ function revealEstGabarito(){
   const gabOrig = q.gabarito;
   const gabDisp = oMap[gabOrig] || gabOrig;
   const isCorrect = selOrig === gabOrig;
-  // DEBUG — remove after testing
-  console.log('REVEAL EST | selDisp='+selDisp+' selOrig='+selOrig+' gabOrig='+gabOrig+' gabDisp='+gabDisp+' isCorrect='+isCorrect);
-  console.log('displayMap='+JSON.stringify(dMap)+' origMap='+JSON.stringify(oMap));
 
   // Style alternatives using display letters
   document.querySelectorAll('#est-alts .alt').forEach(a=>{
