@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-22T21:25:58.186Z",
+  "saved_at": "2026-09-22T21:26:25.321Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 4,
@@ -1309,32 +1309,6 @@
         }
       ],
       "last_result": "confident_correct"
-    },
-    "e5c55a39-f3f4-49d9-85d2-5dd615242f46": {
-      "step": 0,
-      "next_due": "2026-09-23",
-      "last_answered": "2026-09-22",
-      "total_attempts": 2,
-      "confident_correct": 0,
-      "history": [
-        {
-          "date": "2026-09-21",
-          "confidence": "certain",
-          "correct": false,
-          "step": 0,
-          "newStep": 0,
-          "days": 1
-        },
-        {
-          "date": "2026-09-22",
-          "confidence": "chutei",
-          "correct": false,
-          "step": 0,
-          "newStep": 0,
-          "days": 1
-        }
-      ],
-      "last_result": "wrong"
     },
     "59cc8b62-43d1-4f71-b3b7-8569af54074d": {
       "step": 1,
