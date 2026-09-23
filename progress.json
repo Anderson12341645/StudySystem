@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-23T14:32:28.648Z",
+  "saved_at": "2026-09-23T14:57:49.912Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 4,
@@ -2001,10 +2001,82 @@
         }
       ],
       "last_result": "wrong"
+    },
+    "e5c55a39-f3f4-49d9-85d2-5dd615242f46": {
+      "step": 1,
+      "next_due": "2026-09-26",
+      "last_answered": "2026-09-23",
+      "total_attempts": 1,
+      "confident_correct": 1,
+      "history": [
+        {
+          "date": "2026-09-23",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
+        }
+      ],
+      "last_result": "confident_correct"
+    },
+    "845bedc6-e4b5-4b4b-9e2d-1ff0daeec8da": {
+      "step": 1,
+      "next_due": "2026-09-26",
+      "last_answered": "2026-09-23",
+      "total_attempts": 1,
+      "confident_correct": 1,
+      "history": [
+        {
+          "date": "2026-09-23",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
+        }
+      ],
+      "last_result": "confident_correct"
+    },
+    "ebb48e6e-8c80-4a62-b82d-70fbc1177a47": {
+      "step": 1,
+      "next_due": "2026-09-26",
+      "last_answered": "2026-09-23",
+      "total_attempts": 1,
+      "confident_correct": 1,
+      "history": [
+        {
+          "date": "2026-09-23",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
+        }
+      ],
+      "last_result": "confident_correct"
+    },
+    "d54fdbd1-c41e-4a33-ae0e-42ed9f69a7d1": {
+      "step": 0,
+      "next_due": "2026-09-24",
+      "last_answered": "2026-09-23",
+      "total_attempts": 1,
+      "confident_correct": 0,
+      "history": [
+        {
+          "date": "2026-09-23",
+          "confidence": "unsure",
+          "correct": false,
+          "step": 0,
+          "newStep": 0,
+          "days": 1
+        }
+      ],
+      "last_result": "wrong"
     }
   },
   "streak": {
-    "today_count": 10,
+    "today_count": 14,
     "today_date": "2026-09-23",
     "current": 1,
     "last_date": "2026-09-23",
@@ -2012,267 +2084,11 @@
   },
   "settings": {},
   "notes": {
-    "d34efd0e-c84a-4357-9116-4ab54535b3eb": {
+    "e5c55a39-f3f4-49d9-85d2-5dd615242f46": {
       "text": "",
       "has_images": true
     },
-    "9d83cc0e-69f1-4a5b-8cd9-248fa980eb1d": {
-      "text": "",
-      "has_images": true
-    },
-    "1a1f061b-43ae-4509-8c5f-e22062556707": {
-      "text": "",
-      "has_images": true
-    },
-    "3b707e68-cf34-48a1-9dd4-3435408502ff": {
-      "text": "",
-      "has_images": true
-    },
-    "c51e751b-a9e6-48f1-8493-3a0f3b9dafc1": {
-      "text": "",
-      "has_images": true
-    },
-    "d6564bc7-8c45-4d73-8707-9be46d6bb833": {
-      "text": "",
-      "has_images": true
-    },
-    "6ad25aa3-89c3-432a-8f56-12f8dde90161": {
-      "text": "",
-      "has_images": true
-    },
-    "7e063311-6ec8-40b5-9e8a-76496d8d7305": {
-      "text": "",
-      "has_images": true
-    },
-    "0f9c9fc9-7878-4a80-a70f-bb381984c0b6": {
-      "text": "",
-      "has_images": true
-    },
-    "c4047d3f-c254-4180-b276-0fba1ab0f009": {
-      "text": "",
-      "has_images": true
-    },
-    "c0c04216-1f47-4953-9c57-4dc1e7f6bee8": {
-      "text": "",
-      "has_images": true
-    },
-    "177749b5-025d-4239-85bf-8e1665610671": {
-      "text": "",
-      "has_images": true
-    },
-    "14c90920-2ff3-4957-b333-4d690945cacc": {
-      "text": "",
-      "has_images": true
-    },
-    "49bcef92-0f82-49fd-8b9f-c1bc0e99a58f": {
-      "text": "",
-      "has_images": true
-    },
-    "aeda44ca-e243-4774-8b0a-40cda1f6bb8b": {
-      "text": "",
-      "has_images": true
-    },
-    "da4c8193-b6a0-4a5a-b8bc-123eef65bc25": {
-      "text": "",
-      "has_images": true
-    },
-    "883911ac-aa92-499f-b307-31de1fe2862a": {
-      "text": "",
-      "has_images": true
-    },
-    "4e212948-6b7a-41f4-9eb8-1ffb0f1b01bf": {
-      "text": "",
-      "has_images": true
-    },
-    "c24f05fb-cd24-4df4-90c8-afe6383a9b73": {
-      "text": "",
-      "has_images": true
-    },
-    "c544617a-30b4-40ba-b899-59da3782b43c": {
-      "text": "",
-      "has_images": true
-    },
-    "35cd3eaa-4d48-4741-afd8-7f9f65ea2a9c": {
-      "text": "",
-      "has_images": true
-    },
-    "f733df44-3283-4c8f-9a8d-da65f76ab6c1": {
-      "text": "",
-      "has_images": true
-    },
-    "93d2ecd8-d2ab-4b39-997f-34035ad75760": {
-      "text": "",
-      "has_images": true
-    },
-    "6b41f635-61b7-40f8-a260-c61aab1b2701": {
-      "text": "",
-      "has_images": true
-    },
-    "0524ff7a-501b-411c-a2f0-6c7718b4c46c": {
-      "text": "",
-      "has_images": true
-    },
-    "ec595a21-5d15-47bc-8b0a-cf9956083d7a": {
-      "text": "",
-      "has_images": true
-    },
-    "f8edf4b1-cce1-401e-b308-cc7d409cfe33": {
-      "text": "",
-      "has_images": true
-    },
-    "3644b4d2-3d2b-49c3-a8a2-d7e51f4ce47e": {
-      "text": "",
-      "has_images": true
-    },
-    "25d2595d-fc20-4387-84a8-9387e7d3b8fe": {
-      "text": "",
-      "has_images": true
-    },
-    "ab390d75-1787-449f-a275-f315d1ba358b": {
-      "text": "",
-      "has_images": true
-    },
-    "58cccb9a-a5f5-47f0-ba4d-9a473ff53e02": {
-      "text": "",
-      "has_images": true
-    },
-    "a3eaf100-dde2-4b33-93a2-85a95c3e6558": {
-      "text": "",
-      "has_images": true
-    },
-    "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
-      "text": "",
-      "has_images": true
-    },
-    "dd51f798-f524-44ce-94e4-ad572d95b38d": {
-      "text": "",
-      "has_images": true
-    },
-    "499bafe1-e5c5-4f9f-ba60-76fc0aa0fd62": {
-      "text": "",
-      "has_images": true
-    },
-    "55efc83d-5b27-48e6-a510-25ce6a5dee54": {
-      "text": "",
-      "has_images": true
-    },
-    "cd49d669-026a-43d8-8621-696f7204d9f8": {
-      "text": "",
-      "has_images": true
-    },
-    "a38b6dd2-453d-4b54-807a-bcacb33c45f6": {
-      "text": "",
-      "has_images": true
-    },
-    "3ea8f50f-ccf3-44ec-ba9b-8fcd86f9f708": {
-      "text": "",
-      "has_images": true
-    },
-    "07346f18-1200-445f-9890-eec78658af75": {
-      "text": "",
-      "has_images": true
-    },
-    "03639e18-f38c-4a3f-844b-715696d938f7": {
-      "text": "",
-      "has_images": true
-    },
-    "0feae0ee-d415-46a8-a526-a5d0b7e43b80": {
-      "text": "",
-      "has_images": true
-    },
-    "bc7ec460-df60-444c-87c9-2c39e25acbd4": {
-      "text": "",
-      "has_images": true
-    },
-    "8668cece-d165-4f4b-829f-c6eaeba5ea47": {
-      "text": "",
-      "has_images": true
-    },
-    "fa22c9bf-5a76-47b9-91a0-59f55aed40e0": {
-      "text": "",
-      "has_images": true
-    },
-    "a0397c11-b205-42ef-90c6-dec58cc48e9c": {
-      "text": "",
-      "has_images": true
-    },
-    "fc061fb3-3fc2-490b-932b-5987fb3076f8": {
-      "text": "",
-      "has_images": true
-    },
-    "165a9cb1-1286-422d-be4d-9443dabcb7d0": {
-      "text": "",
-      "has_images": true
-    },
-    "32299a4d-e0f4-4462-bcc5-06468aeab7e6": {
-      "text": "",
-      "has_images": true
-    },
-    "d68e98d3-2e66-46e6-8096-d74926822891": {
-      "text": "",
-      "has_images": true
-    },
-    "b90c402d-62be-41ec-95e5-4bca074cb796": {
-      "text": "",
-      "has_images": true
-    },
-    "7387124d-4da8-4077-8ec4-6afa2a0fa02b": {
-      "text": "",
-      "has_images": true
-    },
-    "db1b1f21-db7f-472f-a525-69a7b6714d47": {
-      "text": "",
-      "has_images": true
-    },
-    "f9de1244-0c45-4ac1-94a0-9e77a91341e7": {
-      "text": "Separação de Iluminação e Tomadas (Item 9.5.2.2): Circuitos de iluminação devem ser independentes dos circuitos de tomadas de uso geral (TUG) e tomadas de uso específico (TUE).",
-      "has_images": false
-    },
-    "7c7d39ce-0929-4da3-b33e-b96b0a651376": {
-      "text": "Fontes Chaveadas geram 3º Harmônico: Equipamentos eletrônicos são cargas não lineares que deformam a onda senoidal, gerando correntes em frequências múltiplas da fundamental ($180 Hz, $540Hz, etc.).\n\nHarmônicos de Sequência Zero (Triplens): Os harmônicos de 3ª ordem (e seus múltiplos: 9º, 15º) possuem a particularidade de estarem em fase entre as três fases do sistema 0 de defasagem angular entre si).\n\nSoma no Neutro: Como não há defasagem de 120 para cancelar essas correntes (como ocorre na frequência fundamental de $60Hz), elas se somam aritmeticamente ao retornar pelo condutor de neutro:\n\nIsso faz com que o neutro conduza uma corrente muito elevada — às vezes superando a própria corrente das fases —, mesmo em sistemas com fases equilibradas.",
-      "has_images": false
-    },
-    "cdfc2ca8-20fd-4f57-b5eb-135594c060b9": {
-      "text": "Condutor Ativo: Pela norma NBR 5410, condutores ativos são aqueles destinados a transportar corrente elétrica em condições normais de operação. Isso inclui os condutores de Fase e o condutor Neutro.\n\nFunção do Neutro: Servir como caminho de retorno para a corrente e fornecer a referência de 0V para cargas monofásicas. Em sistemas desequilibrados, a corrente de desequilíbrio circula permanentemente pelo neutro.\n\nFunção do Terra (Proteção / PE): O condutor de proteção NÃO é um condutor ativo. Em condições normais de operação, não circula corrente por ele (corrente nula). Ele só conduz corrente temporariamente em situações de falha/defeito (ex: fuga de corrente para a carcaça) para secionar o circuito pela proteção (DR ou disjuntor).",
-      "has_images": true
-    },
-    "7f5a8547-d2e0-4bf2-9145-3e7ca2d4bebb": {
-      "text": "Fenômeno\nDesequilíbrio de Fases (> 10%) \nSurgimento de Sequência Negativa ---> Campo oposto (freio) ---> Sobreaquecimento e perda de vida útil.\nEfeito no Neutro \nAumento da corrente de retorno ---> Mais perdas por Efeito Joule.",
-      "has_images": true
-    },
-    "9d900ff7-56ab-4fa6-b8fd-e9b378b97829": {
-      "text": "",
-      "has_images": true
-    },
-    "2e977898-1b37-41bd-bade-a1d2fdad124e": {
-      "text": "",
-      "has_images": true
-    },
-    "cb7de0dc-bd66-4015-8018-297f9c4c04c3": {
-      "text": "",
-      "has_images": true
-    },
-    "7a676a71-c9e9-4331-a957-119950fce538": {
-      "text": "",
-      "has_images": true
-    },
-    "25550c2b-4a8d-4681-96d1-5dd156240bba": {
-      "text": "",
-      "has_images": true
-    },
-    "d2c842fb-c474-4b23-acf1-eee4a8d2f7c9": {
-      "text": "",
-      "has_images": true
-    },
-    "05f5e8d7-6bac-4dfc-a54a-0cc430d857ad": {
-      "text": "",
-      "has_images": true
-    },
-    "4a888ee9-8782-475b-a1ea-e0376678114f": {
-      "text": "",
-      "has_images": true
-    },
-    "fc556acd-b2eb-4bb7-8246-41feb2d4bd03": {
+    "d54fdbd1-c41e-4a33-ae0e-42ed9f69a7d1": {
       "text": "",
       "has_images": true
     }
