@@ -3088,9 +3088,8 @@ const AUTO_LOAD_FILES = [
 const AUTO_LOADED_KEY = 'cq_auto_loaded_v3';
 
 async function autoLoadQuestions(){
-  // Only run once — if already loaded or user already has questions, skip
+  // Only run once per version key
   if(localStorage.getItem(AUTO_LOADED_KEY)) return;
-  if(loadQ().length > 3) return; // more than sample data = already loaded
 
   const banner = document.createElement('div');
   banner.id = 'auto-load-banner';
