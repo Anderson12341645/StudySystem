@@ -2790,15 +2790,17 @@ async function syncWithGitHub(){
 
   try{
     if(choice){
-      // PUSH
+      // PUSH — progress + images
       setSyncBtn('saving');
       const payload = buildProgressPayload();
       await pushToGitHub(payload);
+      // Push nota images to GitHub
+      const imgCount = await pushNotaImagesToGitHub(token);
       localStorage.setItem(SYNC_TS_KEY, new Date().toISOString());
       setSyncBtn('ok');
-      showToast('☁️ Progresso salvo no GitHub!');
+      showToast(`☁️ Progresso salvo! ${imgCount>0?imgCount+' imagem(ns) sincronizada(s)':''}`);
     } else {
-      // PULL
+      // PULL — progress + images
       setSyncBtn('loading');
       const payload = await pullFromGitHub();
       // Check if remote is newer
@@ -2812,9 +2814,11 @@ async function syncWithGitHub(){
         }
       }
       applyProgress(payload);
+      // Pull nota images from GitHub
+      const imgCount = await pullNotaImagesFromGitHub(token);
       localStorage.setItem(SYNC_TS_KEY, payload.saved_at||new Date().toISOString());
       setSyncBtn('ok');
-      showToast('☁️ Progresso carregado do GitHub!');
+      showToast(`☁️ Progresso carregado! ${imgCount>0?imgCount+' imagem(ns) baixada(s)':''}`);
       updateStatusBar();
       renderRevHome();
       renderDashboard();
@@ -2826,6 +2830,170 @@ async function syncWithGitHub(){
   }
   if(btn) btn.disabled=false;
 }
+
+// ── Nota image sync via GitHub API ───────────────────────────────────
+// Images are stored as: notas/[qId]_[idx].jpg in the repository
+// We track which images have been pushed via localStorage key
+
+const NOTA_SYNC_KEY = 'cq_nota_img_synced'; // Set of "qId_idx" strings already pushed
+
+function getNotaSyncedSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(NOTA_SYNC_KEY)||'[]')); }
+  catch(_){ return new Set(); }
+}
+function addToNotaSyncedSet(keys){
+  const s = getNotaSyncedSet();
+  keys.forEach(k=>s.add(k));
+  localStorage.setItem(NOTA_SYNC_KEY, JSON.stringify([...s]));
+}
+
+async function ghFileUrl(filename){
+  return `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/notas/${filename}`;
+}
+
+async function pushOneImage(token, img){
+  const key = `${img.qId}_${img.idx}`;
+  const filename = `${key}.jpg`;
+  const url = await ghFileUrl(filename);
+
+  // Extract base64 content (remove data:image/...;base64, prefix)
+  const base64 = img.dataUrl.replace(/^data:[^;]+;base64,/, '');
+
+  // Check if file already exists (need SHA to update)
+  let sha = null;
+  try{
+    const check = await fetch(url, {headers:{Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json'}});
+    if(check.ok){ const d = await check.json(); sha = d.sha; }
+  }catch(_){}
+
+  const body = {
+    message: `nota img ${key}`,
+    content: base64,
+  };
+  if(sha) body.sha = sha;
+
+  const resp = await fetch(url, {
+    method: 'PUT',
+    headers: {Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  if(!resp.ok){
+    const e = await resp.json();
+    throw new Error(`Push ${key}: ${e.message||resp.status}`);
+  }
+  return key;
+}
+
+async function pushNotaImagesToGitHub(token){
+  // Get all images from IndexedDB
+  const db = await openNotaDB();
+  const allImgs = await new Promise(res=>{
+    const all=[], req=db.transaction(NOTA_STORE,'readonly').objectStore(NOTA_STORE).openCursor();
+    req.onsuccess=e=>{const c=e.target.result;if(c){all.push(c.value);c.continue();}else res(all);};
+    req.onerror=()=>res([]);
+  });
+
+  if(allImgs.length===0) return 0;
+
+  const synced = getNotaSyncedSet();
+  const toSync = allImgs.filter(img=> !synced.has(`${img.qId}_${img.idx}`));
+
+  if(toSync.length===0) return 0;
+
+  showToast(`⏳ Enviando ${toSync.length} imagem(ns) para GitHub...`);
+  let pushed = 0;
+  const newKeys = [];
+
+  for(const img of toSync){
+    try{
+      const key = await pushOneImage(token, img);
+      newKeys.push(key);
+      pushed++;
+    }catch(e){
+      console.warn('Failed to push image:', e.message);
+    }
+  }
+
+  if(newKeys.length>0) addToNotaSyncedSet(newKeys);
+  return pushed;
+}
+
+async function pullNotaImagesFromGitHub(token){
+  // List all files in notas/ folder
+  const listUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/notas`;
+  let files = [];
+  try{
+    const resp = await fetch(listUrl+'?t='+Date.now(), {
+      headers:{Authorization:`token ${token}`, Accept:'application/vnd.github.v3+json'}
+    });
+    if(!resp.ok) return 0; // notas folder doesn't exist yet
+    files = await resp.json();
+  }catch(_){ return 0; }
+
+  if(!Array.isArray(files)||files.length===0) return 0;
+
+  // Get existing local images to avoid re-downloading
+  const db = await openNotaDB();
+  const existing = await new Promise(res=>{
+    const keys=[], req=db.transaction(NOTA_STORE,'readonly').objectStore(NOTA_STORE).openCursor();
+    req.onsuccess=e=>{const c=e.target.result;if(c){keys.push(c.value.key);c.continue();}else res(new Set(keys));};
+    req.onerror=()=>res(new Set());
+  });
+
+  // Filter to only download images we don't have yet
+  const toDownload = files.filter(f=>{
+    if(!f.name.endsWith('.jpg')) return false;
+    const key = f.name.replace('.jpg',''); // "qId_idx"
+    return !existing.has(key);
+  });
+
+  if(toDownload.length===0) return 0;
+
+  showToast(`⏳ Baixando ${toDownload.length} imagem(ns) do GitHub...`);
+  let downloaded = 0;
+  const newKeys = [];
+
+  for(const file of toDownload){
+    try{
+      // Download the file content
+      const resp = await fetch(file.download_url);
+      if(!resp.ok) continue;
+      const blob = await resp.blob();
+      const dataUrl = await new Promise(res=>{
+        const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob);
+      });
+
+      // Parse qId and idx from filename: "qId_idx.jpg"
+      const keyPart = file.name.replace('.jpg','');
+      const lastUnderscore = keyPart.lastIndexOf('_');
+      const qId = keyPart.slice(0, lastUnderscore);
+      const idx  = parseInt(keyPart.slice(lastUnderscore+1));
+
+      if(!qId || isNaN(idx)) continue;
+
+      // Save to IndexedDB
+      await new Promise((res,rej)=>{
+        const tx=db.transaction(NOTA_STORE,'readwrite');
+        tx.objectStore(NOTA_STORE).put({key:keyPart, qId, idx, dataUrl, name:file.name});
+        tx.oncomplete=res; tx.onerror=e=>rej(e.target.error);
+      });
+
+      // Update nota_has_images flag on the question
+      const qs = loadQ();
+      const qi = qs.findIndex(q=>q.id===qId);
+      if(qi!==-1 && !qs[qi].nota_has_images){ qs[qi].nota_has_images=true; saveQ(qs); }
+
+      newKeys.push(keyPart);
+      downloaded++;
+    }catch(e){
+      console.warn('Failed to download image:', file.name, e.message);
+    }
+  }
+
+  if(newKeys.length>0) addToNotaSyncedSet(newKeys);
+  return downloaded;
+}
+// ─────────────────────────────────────────────────────────────────────
 
 // Auto-pull on load if we've never synced on this device
 async function autoSyncOnLoad(){
@@ -2840,6 +3008,9 @@ async function autoSyncOnLoad(){
       updateStatusBar();
       renderRevHome();
     }
+    // Also pull nota images silently
+    const token = getGHToken();
+    if(token) pullNotaImagesFromGitHub(token).catch(_=>{});
   } catch(_){ /* no progress.json yet — that's fine */ }
 }
 // ─────────────────────────────────────────────────────────────────────
