@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-27T11:13:10.027Z",
+  "saved_at": "2026-09-27T12:49:57.943Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 4,
@@ -477,10 +477,10 @@
       "step": 2
     },
     "bc7ec460-df60-444c-87c9-2c39e25acbd4": {
-      "next_due": "2026-09-26",
+      "next_due": "2026-10-04",
       "last_result": "confident_correct",
-      "confident_correct": 1,
-      "total_attempts": 3,
+      "confident_correct": 2,
+      "total_attempts": 4,
       "history": [
         {
           "date": "2026-09-16",
@@ -503,16 +503,24 @@
           "step": 0,
           "newStep": 1,
           "days": 3
+        },
+        {
+          "date": "2026-09-27",
+          "confidence": "certain",
+          "correct": true,
+          "step": 1,
+          "newStep": 2,
+          "days": 7
         }
       ],
-      "step": 1,
-      "last_answered": "2026-09-23"
+      "step": 2,
+      "last_answered": "2026-09-27"
     },
     "8668cece-d165-4f4b-829f-c6eaeba5ea47": {
-      "next_due": "2026-09-26",
+      "next_due": "2026-10-04",
       "last_result": "confident_correct",
-      "confident_correct": 1,
-      "total_attempts": 3,
+      "confident_correct": 2,
+      "total_attempts": 4,
       "history": [
         {
           "date": "2026-09-16",
@@ -535,10 +543,18 @@
           "step": 0,
           "newStep": 1,
           "days": 3
+        },
+        {
+          "date": "2026-09-27",
+          "confidence": "certain",
+          "correct": true,
+          "step": 1,
+          "newStep": 2,
+          "days": 7
         }
       ],
-      "step": 1,
-      "last_answered": "2026-09-23"
+      "step": 2,
+      "last_answered": "2026-09-27"
     },
     "fa22c9bf-5a76-47b9-91a0-59f55aed40e0": {
       "next_due": "2026-09-26",
@@ -573,10 +589,10 @@
       "last_answered": "2026-09-23"
     },
     "a0397c11-b205-42ef-90c6-dec58cc48e9c": {
-      "next_due": "2026-09-26",
-      "last_result": "wrong",
-      "confident_correct": 1,
-      "total_attempts": 3,
+      "next_due": "2026-09-30",
+      "last_result": "confident_correct",
+      "confident_correct": 2,
+      "total_attempts": 4,
       "history": [
         {
           "date": "2026-09-16",
@@ -599,10 +615,18 @@
           "step": 1,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-27",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "step": 0,
-      "last_answered": "2026-09-25"
+      "step": 1,
+      "last_answered": "2026-09-27"
     },
     "fc061fb3-3fc2-490b-932b-5987fb3076f8": {
       "next_due": "2026-09-26",
@@ -661,10 +685,10 @@
       "last_answered": "2026-09-22"
     },
     "32299a4d-e0f4-4462-bcc5-06468aeab7e6": {
-      "next_due": "2026-09-26",
+      "next_due": "2026-10-04",
       "last_result": "confident_correct",
-      "confident_correct": 1,
-      "total_attempts": 3,
+      "confident_correct": 2,
+      "total_attempts": 4,
       "history": [
         {
           "date": "2026-09-16",
@@ -687,10 +711,18 @@
           "step": 0,
           "newStep": 1,
           "days": 3
+        },
+        {
+          "date": "2026-09-27",
+          "confidence": "certain",
+          "correct": true,
+          "step": 1,
+          "newStep": 2,
+          "days": 7
         }
       ],
-      "step": 1,
-      "last_answered": "2026-09-23"
+      "step": 2,
+      "last_answered": "2026-09-27"
     },
     "d68e98d3-2e66-46e6-8096-d74926822891": {
       "next_due": "2026-09-25",
