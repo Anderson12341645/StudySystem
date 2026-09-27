@@ -1153,6 +1153,13 @@ function openNotaImgFull(src, name){
   hint.textContent = 'Duplo-toque = fechar · Toque fora = fechar';
   ov.appendChild(hint);
 
+  // Big close button at bottom center — always reachable on mobile
+  const closeBtnBottom = document.createElement('button');
+  closeBtnBottom.textContent = '✕ Fechar';
+  closeBtnBottom.style.cssText = 'position:fixed;bottom:48px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;border:2px solid rgba(255,255,255,.5);border-radius:24px;padding:10px 28px;font-size:15px;font-weight:700;cursor:pointer;z-index:10000;touch-action:manipulation';
+  closeBtnBottom.onclick = (e)=>{ e.stopPropagation(); ov.remove(); };
+  ov.appendChild(closeBtnBottom);
+
   document.body.appendChild(ov);
 
   // ── Zoom + Pan state ────────────────────────────────────────────
@@ -3465,12 +3472,17 @@ async function mangaOpenFull(mangaId, startIdx){
 
   const hint=document.createElement('div');
   hint.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:11px;z-index:10000;pointer-events:none;white-space:nowrap';
-  hint.textContent='duplo-toque = fechar · ◀▶ = navegar · toque fora = fechar';
+  hint.textContent='◀▶ navegar · toque fora = fechar';
+
+  const closeBtnBottom2=document.createElement('button');
+  closeBtnBottom2.textContent='✕ Fechar';
+  closeBtnBottom2.style.cssText='position:fixed;bottom:48px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);color:#fff;border:2px solid rgba(255,255,255,.5);border-radius:24px;padding:10px 28px;font-size:15px;font-weight:700;cursor:pointer;z-index:10000;touch-action:manipulation';
+  closeBtnBottom2.onclick=(e)=>{e.stopPropagation();ov.remove();};
 
   const img=document.createElement('img');
   img.style.cssText='max-width:90vw;max-height:88vh;border-radius:6px;box-shadow:0 0 40px rgba(0,0,0,.8);transform-origin:center center;cursor:grab;position:relative;z-index:1';
 
-  ov.append(toolbar,hint,img);
+  ov.append(toolbar,hint,closeBtnBottom2,img);
   document.body.appendChild(ov);
 
   // zoom/pan state
