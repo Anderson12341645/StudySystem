@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-25T13:20:45.471Z",
+  "saved_at": "2026-09-27T08:56:13.162Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 4,
@@ -1337,11 +1337,11 @@
       "last_result": "confident_correct"
     },
     "c0c04216-1f47-4953-9c57-4dc1e7f6bee8": {
-      "step": 0,
-      "next_due": "2026-09-26",
-      "last_answered": "2026-09-25",
-      "total_attempts": 3,
-      "confident_correct": 1,
+      "step": 1,
+      "next_due": "2026-09-30",
+      "last_answered": "2026-09-27",
+      "total_attempts": 4,
+      "confident_correct": 2,
       "history": [
         {
           "date": "2026-09-21",
@@ -1366,9 +1366,17 @@
           "step": 1,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-27",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "wrong"
+      "last_result": "confident_correct"
     },
     "177749b5-025d-4239-85bf-8e1665610671": {
       "step": 1,
@@ -2297,11 +2305,11 @@
       "last_result": "confident_correct"
     },
     "ab390d75-1787-449f-a275-f315d1ba358b": {
-      "step": 0,
-      "next_due": "2026-09-25",
-      "last_answered": "2026-09-24",
-      "total_attempts": 2,
-      "confident_correct": 0,
+      "step": 1,
+      "next_due": "2026-09-30",
+      "last_answered": "2026-09-27",
+      "total_attempts": 3,
+      "confident_correct": 1,
       "history": [
         {
           "date": "2026-09-23",
@@ -2318,9 +2326,17 @@
           "step": 0,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-27",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "wrong"
+      "last_result": "confident_correct"
     },
     "e5c55a39-f3f4-49d9-85d2-5dd615242f46": {
       "step": 1,
