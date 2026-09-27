@@ -446,8 +446,41 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 
 <!-- ═══════════════════════════════════════════════════ REVISÃO ═══ -->
 <div class="mod" id="mod-revisao">
+  <!-- Setup screen -->
   <div id="rev-ready">
-    <div id="rev-count-display"></div>
+    <div class="sl">Configurar Revisão</div>
+
+    <div id="rev-summary-box" style="margin-bottom:14px"></div>
+
+    <div class="grid2">
+      <div class="form-group">
+        <label class="form-label">Disciplina</label>
+        <select class="form-control" id="rev-disciplina" onchange="updateRevPreview()">
+          <option value="">Todas as disciplinas</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quantidade</label>
+        <select class="form-control" id="rev-qtd" onchange="updateRevPreview()">
+          <option value="0">Todas disponíveis</option>
+          <option value="10">10 questões</option>
+          <option value="20">20 questões</option>
+          <option value="30">30 questões</option>
+          <option value="50">50 questões</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Prioridade</label>
+      <select class="form-control" id="rev-ordem" onchange="updateRevPreview()">
+        <option value="erradas">Priorizar mais erradas (recomendado)</option>
+        <option value="aleatorio">Aleatório</option>
+        <option value="antigas">Mais antigas primeiro</option>
+      </select>
+    </div>
+
+    <div id="rev-preview-box" style="margin-bottom:14px"></div>
     <div id="rev-start-area"></div>
   </div>
   <div id="rev-session" style="display:none">
@@ -1882,25 +1915,125 @@ function showEstSetup(){
 let revSession={qs:[],idx:0,selectedAlt:null,confidence:null,currentQ:null};
 
 function renderRevHome(){
-  const due=getDueQuestions();
-  const countEl=document.getElementById('rev-count-display');
-  const startEl=document.getElementById('rev-start-area');
-  if(due.length===0){
-    countEl.innerHTML='<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nenhuma revisão pendente hoje!</div><div class="empty-text">Continue fazendo questões novas no módulo Estudar.</div></div>';
-    startEl.innerHTML='';
-  } else {
-    countEl.innerHTML=`<div class="note note-amber" style="margin-bottom:12px"><strong>${due.length} questão(ões)</strong> para revisar hoje baseado no cronograma de repetição espaçada.</div>`;
-    startEl.innerHTML=`<button class="btn btn-primary" onclick="startRevSession()" style="width:100%;justify-content:center;padding:12px">🔁 Iniciar Revisão (${due.length} questões)</button>`;
+  const due = getDueQuestions();
+  const sr  = loadSR();
+
+  // Populate discipline filter
+  const discs = [...new Set(due.map(q=>q.disciplina))].sort();
+  const sel = document.getElementById('rev-disciplina');
+  const prevDisc = sel?.value||'';
+  if(sel){
+    sel.innerHTML = '<option value="">Todas as disciplinas</option>' +
+      discs.map(d=>`<option${prevDisc===d?' selected':''}>${d}</option>`).join('');
   }
+
+  // Summary box
+  const summaryEl = document.getElementById('rev-summary-box');
+  if(summaryEl){
+    if(due.length===0){
+      summaryEl.innerHTML='<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">Nenhuma revisão pendente hoje!</div><div class="empty-text">Continue fazendo questões no módulo Estudar.</div></div>';
+      document.getElementById('rev-start-area').innerHTML='';
+      document.getElementById('rev-preview-box').innerHTML='';
+      return;
+    }
+    summaryEl.innerHTML=`<div class="note note-amber"><strong>${due.length} questão(ões)</strong> para revisar hoje no total.</div>`;
+  }
+
+  updateRevPreview();
+
   document.getElementById('rev-ready').style.display='block';
   document.getElementById('rev-session').style.display='none';
   document.getElementById('rev-done').style.display='none';
 }
 
+function updateRevPreview(){
+  const due   = getDueQuestions();
+  const sr    = loadSR();
+  const disc  = document.getElementById('rev-disciplina')?.value||'';
+  const ordem = document.getElementById('rev-ordem')?.value||'erradas';
+  const qtdSel= parseInt(document.getElementById('rev-qtd')?.value||'0');
+
+  let filtered = disc ? due.filter(q=>q.disciplina===disc) : [...due];
+
+  if(filtered.length===0){
+    document.getElementById('rev-preview-box').innerHTML=
+      '<div class="note note-amber">Nenhuma questão disponível para este filtro.</div>';
+    document.getElementById('rev-start-area').innerHTML='';
+    return;
+  }
+
+  // Sort by priority
+  const today = todayStr();
+  if(ordem==='erradas'){
+    filtered.sort((a,b)=>{
+      const aErrs=(sr[a.id]?.history||[]).filter(h=>!h.correct).length;
+      const bErrs=(sr[b.id]?.history||[]).filter(h=>!h.correct).length;
+      return bErrs-aErrs;
+    });
+  } else if(ordem==='antigas'){
+    filtered.sort((a,b)=>{
+      const aDate=sr[a.id]?.last_answered||'0';
+      const bDate=sr[b.id]?.last_answered||'0';
+      return aDate.localeCompare(bDate);
+    });
+  } else {
+    filtered.sort(()=>Math.random()-.5);
+  }
+
+  const total   = filtered.length;
+  const vai     = qtdSel>0 ? Math.min(qtdSel,total) : total;
+  const byDisc  = {};
+  filtered.slice(0,vai).forEach(q=>{
+    byDisc[q.disciplina]=(byDisc[q.disciplina]||0)+1;
+  });
+
+  const discHtml = Object.entries(byDisc).map(([d,c])=>
+    `<span style="font-size:11px;color:var(--text3);margin-right:10px">${d}: ${c}</span>`).join('');
+
+  document.getElementById('rev-preview-box').innerHTML=`
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">
+        ${vai} questão(ões) nesta sessão
+        ${total>vai?`<span style="font-size:11px;color:var(--text3)"> de ${total} disponíveis</span>`:''}
+      </div>
+      <div style="flex-wrap:wrap;display:flex">${discHtml}</div>
+    </div>`;
+
+  document.getElementById('rev-start-area').innerHTML=
+    `<button class="btn btn-primary" onclick="startRevSession()" style="width:100%;justify-content:center;padding:12px;margin-top:8px">
+      🔁 Iniciar Revisão (${vai} questões)
+    </button>`;
+}
+
 function startRevSession(){
-  const qs=getDueQuestions();
-  if(qs.length===0)return;
-  revSession={qs:[...qs].sort(()=>Math.random()-.5),idx:0,selectedAlt:null,confidence:null,currentQ:null};
+  const due   = getDueQuestions();
+  const sr    = loadSR();
+  const disc  = document.getElementById('rev-disciplina')?.value||'';
+  const ordem = document.getElementById('rev-ordem')?.value||'erradas';
+  const qtdSel= parseInt(document.getElementById('rev-qtd')?.value||'0');
+
+  let qs = disc ? due.filter(q=>q.disciplina===disc) : [...due];
+  if(qs.length===0){ showToast('Nenhuma questão disponível.'); return; }
+
+  if(ordem==='erradas'){
+    qs.sort((a,b)=>{
+      const aErrs=(sr[a.id]?.history||[]).filter(h=>!h.correct).length;
+      const bErrs=(sr[b.id]?.history||[]).filter(h=>!h.correct).length;
+      return bErrs-aErrs;
+    });
+  } else if(ordem==='antigas'){
+    qs.sort((a,b)=>{
+      const aDate=sr[a.id]?.last_answered||'0';
+      const bDate=sr[b.id]?.last_answered||'0';
+      return aDate.localeCompare(bDate);
+    });
+  } else {
+    qs.sort(()=>Math.random()-.5);
+  }
+
+  if(qtdSel>0) qs=qs.slice(0,qtdSel);
+
+  revSession={qs,idx:0,selectedAlt:null,confidence:null,currentQ:null};
   document.getElementById('rev-ready').style.display='none';
   document.getElementById('rev-session').style.display='block';
   showRevQuestion();
