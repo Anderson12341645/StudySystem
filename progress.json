@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-28T23:24:05.044Z",
+  "saved_at": "2026-09-28T23:50:07.329Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 4,
@@ -3737,11 +3737,11 @@
       "last_result": "unsure_correct"
     },
     "5c3892a9-e4ca-4004-960f-baf10fe2f88c": {
-      "step": 0,
-      "next_due": "2026-09-28",
-      "last_answered": "2026-09-27",
-      "total_attempts": 1,
-      "confident_correct": 0,
+      "step": 1,
+      "next_due": "2026-10-01",
+      "last_answered": "2026-09-28",
+      "total_attempts": 2,
+      "confident_correct": 1,
       "history": [
         {
           "date": "2026-09-27",
@@ -3750,21 +3750,37 @@
           "step": 0,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-28",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "wrong"
+      "last_result": "confident_correct"
     },
     "114a70db-ac8d-43d1-b071-a2cf6cdb39ac": {
       "step": 0,
-      "next_due": "2026-09-28",
-      "last_answered": "2026-09-27",
-      "total_attempts": 1,
+      "next_due": "2026-09-29",
+      "last_answered": "2026-09-28",
+      "total_attempts": 2,
       "confident_correct": 0,
       "history": [
         {
           "date": "2026-09-27",
           "confidence": "chutei",
           "correct": true,
+          "step": 0,
+          "newStep": 0,
+          "days": 1
+        },
+        {
+          "date": "2026-09-28",
+          "confidence": "certain",
+          "correct": false,
           "step": 0,
           "newStep": 0,
           "days": 1
@@ -4041,10 +4057,28 @@
         }
       ],
       "last_result": "wrong"
+    },
+    "1e34c02e-c5db-45dc-bbd7-eb9ee393027f": {
+      "step": 0,
+      "next_due": "2026-09-29",
+      "last_answered": "2026-09-28",
+      "total_attempts": 1,
+      "confident_correct": 0,
+      "history": [
+        {
+          "date": "2026-09-28",
+          "confidence": "chutei",
+          "correct": false,
+          "step": 0,
+          "newStep": 0,
+          "days": 1
+        }
+      ],
+      "last_result": "wrong"
     }
   },
   "streak": {
-    "today_count": 28,
+    "today_count": 31,
     "today_date": "2026-09-28",
     "current": 2,
     "last_date": "2026-09-28",
@@ -4069,6 +4103,10 @@
       "has_images": true
     },
     "78aff89c-2093-481e-be74-1396324eb237": {
+      "text": "",
+      "has_images": true
+    },
+    "1e34c02e-c5db-45dc-bbd7-eb9ee393027f": {
       "text": "",
       "has_images": true
     },
