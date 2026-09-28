@@ -214,6 +214,15 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 .manga-add-area input{display:none}
 @media(max-width:600px){.manga-layout{flex-direction:column}.manga-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:12px}}
 </style>
+<!-- MathJax for rendering mathematical notation ($...$) -->
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+  startup: { ready(){ MathJax.startup.defaultReady(); } }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
 </head>
 <body>
 
@@ -1013,6 +1022,37 @@ function escapeHtml(t){
   return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// Render text with basic markdown + MathJax support
+// Handles: **bold**, *italic*, __underline__, and $math$ / $$math$$
+function renderText(t){
+  if(!t) return '';
+  // Escape HTML first (except we need to preserve $ for MathJax)
+  // Strategy: protect math blocks, escape HTML, restore math blocks
+  const mathBlocks = [];
+  let s = t;
+  // Protect display math $$...$$
+  s = s.replace(/\$\$([^$]+)\$\$/g, (_,m)=>{ mathBlocks.push('$$'+m+'$$'); return `\x00M${mathBlocks.length-1}\x00`; });
+  // Protect inline math $...$
+  s = s.replace(/\$([^$\n]+)\$/g, (_,m)=>{ mathBlocks.push('$'+m+'$'); return `\x00M${mathBlocks.length-1}\x00`; });
+  // Escape HTML
+  s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Apply markdown
+  s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s = s.replace(/__([^_]+)__/g,'<u>$1</u>');
+  s = s.replace(/\*([^*]+)\*/g,'<em>$1</em>');
+  s = s.replace(/\n/g,'<br>');
+  // Restore math blocks
+  s = s.replace(/\x00M(\d+)\x00/g, (_,i)=>mathBlocks[parseInt(i)]);
+  return s;
+}
+
+// After injecting HTML with math, trigger MathJax to render it
+function typeset(el){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise([el]).catch(e=>console.warn('MathJax error:',e));
+  }
+}
+
 // Build the nota HTML shell — images are injected asynchronously after render
 function buildNotaHTML(q, prefix){
   const nota    = q.nota_pessoal || '';
@@ -1787,17 +1827,20 @@ function showEstQuestion(){
   } else dicaArea.innerHTML='';
 
   // Body
-  document.getElementById('est-q-body').textContent=q.enunciado;
+  document.getElementById('est-q-body').innerHTML=renderText(q.enunciado);
+  typeset(document.getElementById('est-q-body'));
 
   // Alternatives — rendered in shuffled display order
   const dispLetters=['A','B','C','D','E'].filter(l=>estSession.displayMap[l]);
-  document.getElementById('est-alts').innerHTML=dispLetters.map(dispL=>{
+  const estAltsEl = document.getElementById('est-alts');
+  estAltsEl.innerHTML=dispLetters.map(dispL=>{
     const origL=estSession.displayMap[dispL];
     return `<div class="alt" id="est-alt-${dispL}" onclick="selectAlt('${dispL}')">
       <div class="alt-letter">${dispL}</div>
-      <div class="alt-text">${q.alternativas[origL]}</div>
+      <div class="alt-text">${renderText(q.alternativas[origL])}</div>
     </div>`;
   }).join('');
+  typeset(estAltsEl);
 
   document.getElementById('est-confidence').style.display='none';
   document.getElementById('est-gabarito').style.display='none';
@@ -1847,14 +1890,14 @@ function revealEstGabarito(){
   // Build gabarito content — show original letter labels for clarity
   let html=`<div class="gab-correct-box">
     <div class="gab-correct-label">✅ Alternativa ${gabOrig} — Correta</div>
-    <div class="gab-correct-text">${q.explicacao_correta||'Gabarito: '+gabOrig}</div>
+    <div class="gab-correct-text">${renderText(q.explicacao_correta||'Gabarito: '+gabOrig)}</div>
   </div>`;
 
   if(!isCorrect){
     const expWrong=q.explicacoes_alternativas?.[selOrig];
     html+=`<div class="gab-wrong-box">
       <div class="gab-wrong-label">❌ Sua resposta: Alternativa ${selOrig} — Incorreta</div>
-      <div class="gab-wrong-text">${expWrong||'Esta alternativa está incorreta.'}</div>
+      <div class="gab-wrong-text">${renderText(expWrong||'Esta alternativa está incorreta.')}</div>
     </div>`;
   }
 
@@ -1863,7 +1906,7 @@ function revealEstGabarito(){
   if(others.length>0){
     html+=`<div style="margin-top:10px"><div class="sl">Demais alternativas</div>`;
     others.forEach(l=>{
-      html+=`<div class="gab-other-alt"><strong>${l})</strong> ${q.explicacoes_alternativas[l]}</div>`;
+      html+=`<div class="gab-other-alt"><strong>${l})</strong> ${renderText(q.explicacoes_alternativas[l])}</div>`;
     });
     html+=`</div>`;
   }
@@ -1874,6 +1917,8 @@ function revealEstGabarito(){
   document.getElementById('est-gab-content').innerHTML=html;
   // Load images async after DOM is updated
   initNota('est', q.id);
+  // Render math
+  typeset(document.getElementById('est-gab-content'));
 
   // SR update — uses original letter correctness
   const {srLabel,srClass}=updateSR(q.id,conf,isCorrect);
@@ -2092,17 +2137,20 @@ function showRevQuestion(){
     dicaBox.textContent=q.dica_visual;
   } else dicaArea.innerHTML='';
 
-  document.getElementById('rev-q-body').textContent=q.enunciado;
+  document.getElementById('rev-q-body').innerHTML=renderText(q.enunciado);
+  typeset(document.getElementById('rev-q-body'));
 
   // Alternatives — shuffled display order
   const dispLettersRev=['A','B','C','D','E'].filter(l=>revSession.displayMap[l]);
-  document.getElementById('rev-alts').innerHTML=dispLettersRev.map(dispL=>{
+  const revAltsEl = document.getElementById('rev-alts');
+  revAltsEl.innerHTML=dispLettersRev.map(dispL=>{
     const origL=revSession.displayMap[dispL];
     return `<div class="alt" id="rev-alt-${dispL}" onclick="selectRevAlt('${dispL}')">
       <div class="alt-letter">${dispL}</div>
-      <div class="alt-text">${q.alternativas[origL]}</div>
+      <div class="alt-text">${renderText(q.alternativas[origL])}</div>
     </div>`;
   }).join('');
+  typeset(revAltsEl);
 
   document.getElementById('rev-confidence').style.display='none';
   document.getElementById('rev-gabarito').style.display='none';
@@ -2143,17 +2191,18 @@ function revealRevGabarito(){
 
   let html=`<div class="gab-correct-box">
     <div class="gab-correct-label">✅ Alternativa ${gabOrig} — Correta</div>
-    <div class="gab-correct-text">${q.explicacao_correta||'Gabarito: '+gabOrig}</div>
+    <div class="gab-correct-text">${renderText(q.explicacao_correta||'Gabarito: '+gabOrig)}</div>
   </div>`;
   if(!isCorrect){
     const expWrong=q.explicacoes_alternativas?.[selOrig];
     html+=`<div class="gab-wrong-box">
       <div class="gab-wrong-label">❌ Sua resposta: Alternativa ${selOrig} — Incorreta</div>
-      <div class="gab-wrong-text">${expWrong||'Esta alternativa está incorreta.'}</div>
+      <div class="gab-wrong-text">${renderText(expWrong||'Esta alternativa está incorreta.')}</div>
     </div>`;
   }
 
   document.getElementById('rev-gab-content').innerHTML=html;
+  typeset(document.getElementById('rev-gab-content'));
   const {srLabel,srClass}=advanceSR(q.id,conf,isCorrect);
   document.getElementById('rev-sr-result').innerHTML=`<div class="sr-result ${srClass}">${srLabel}</div>`;
 
@@ -2324,7 +2373,8 @@ function showSimQuestion(){
   document.getElementById('sim-q-header').innerHTML=
     `<span class="badge badge-gray">${q.disciplina}</span>`+
     `<span class="badge badge-gray">${q.subtopico}</span>`;
-  document.getElementById('sim-q-body').textContent=q.enunciado;
+  document.getElementById('sim-q-body').innerHTML=renderText(q.enunciado);
+  typeset(document.getElementById('sim-q-body'));
 
   // Shuffle alternatives and store the map for this question
   const {displayMap, origMap} = shuffleAlts(q);
@@ -2332,13 +2382,15 @@ function showSimQuestion(){
   simState.displayMaps[q.id] = displayMap;
 
   const dispLettersSim=['A','B','C','D','E'].filter(l=>displayMap[l]);
-  document.getElementById('sim-alts').innerHTML=dispLettersSim.map(dispL=>{
+  const simAltsEl = document.getElementById('sim-alts');
+  simAltsEl.innerHTML=dispLettersSim.map(dispL=>{
     const origL=displayMap[dispL];
     return `<div class="alt" id="sim-alt-${dispL}" onclick="selectSimAlt('${dispL}')">
       <div class="alt-letter">${dispL}</div>
-      <div class="alt-text">${q.alternativas[origL]}</div>
+      <div class="alt-text">${renderText(q.alternativas[origL])}</div>
     </div>`;
   }).join('');
+  typeset(simAltsEl);
   document.getElementById('sim-next-btn').disabled=true;
 }
 
