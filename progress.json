@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-28T14:16:15.198Z",
+  "saved_at": "2026-09-28T15:44:02.985Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 4,
@@ -3863,10 +3863,46 @@
         }
       ],
       "last_result": "wrong"
+    },
+    "b2dec28a-7f03-4bdc-b70c-ddfd913771b3": {
+      "step": 0,
+      "next_due": "2026-09-29",
+      "last_answered": "2026-09-28",
+      "total_attempts": 1,
+      "confident_correct": 0,
+      "history": [
+        {
+          "date": "2026-09-28",
+          "confidence": "unsure",
+          "correct": false,
+          "step": 0,
+          "newStep": 0,
+          "days": 1
+        }
+      ],
+      "last_result": "wrong"
+    },
+    "9dafd486-0580-4d73-882b-71dc8143e37f": {
+      "step": 0,
+      "next_due": "2026-09-29",
+      "last_answered": "2026-09-28",
+      "total_attempts": 1,
+      "confident_correct": 0,
+      "history": [
+        {
+          "date": "2026-09-28",
+          "confidence": "unsure",
+          "correct": true,
+          "step": 0,
+          "newStep": 0,
+          "days": 1
+        }
+      ],
+      "last_result": "unsure_correct"
     }
   },
   "streak": {
-    "today_count": 17,
+    "today_count": 19,
     "today_date": "2026-09-28",
     "current": 2,
     "last_date": "2026-09-28",
@@ -3875,6 +3911,14 @@
   "settings": {},
   "notes": {
     "63741b75-3dac-4b9b-ad37-cf19d5cbdd9c": {
+      "text": "",
+      "has_images": true
+    },
+    "b2dec28a-7f03-4bdc-b70c-ddfd913771b3": {
+      "text": "",
+      "has_images": true
+    },
+    "9dafd486-0580-4d73-882b-71dc8143e37f": {
       "text": "",
       "has_images": true
     }
