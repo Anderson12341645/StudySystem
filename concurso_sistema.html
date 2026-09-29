@@ -1034,29 +1034,34 @@ function escapeHtml(t){
 }
 
 // Render text with basic markdown + MathJax support
-// Handles: **bold**, *italic*, __underline__, and $math$ / $$math$$
 function renderText(t){
   if(!t) return '';
   const mathBlocks = [];
   let s = t;
-  // Protect display math $$...$$
+  // Protect math blocks
   s = s.replace(/\$\$([^$]+)\$\$/g, (_,m)=>{ mathBlocks.push('$$'+m+'$$'); return `\x00M${mathBlocks.length-1}\x00`; });
-  // Protect inline math $...$
   s = s.replace(/\$([^$\n]+)\$/g, (_,m)=>{ mathBlocks.push('$'+m+'$'); return `\x00M${mathBlocks.length-1}\x00`; });
   // Escape HTML
   s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  // Apply markdown
+  // Apply markdown formatting
   s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
   s = s.replace(/__([^_]+)__/g,'<u>$1</u>');
-  s = s.replace(/\*([^*]+)\*/g,'<em>$1</em>');
-  // Convert numbered list items to line breaks for readability
-  // e.g. "...texto. 1. Primeiro item. 2. Segundo item." → adds <br> before each number
-  s = s.replace(/\.\s+(\d+)\.\s+/g, '.<br><strong>$1.</strong> ');
-  // Also handle when they start the text
-  s = s.replace(/^(\d+)\.\s+/gm, '<strong>$1.</strong> ');
-  // Restore line breaks
+  s = s.replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+  // Add line break before numbered list items ONLY when clearly a list
+  // Pattern: "). N. " where N is a digit — e.g. "inicial. 2. Uma retirada"
+  // Must be preceded by end of sentence (not just any period)
+  s = s.replace(/\)\.\s+([2-9])\.\s+/g, ').<br><br><strong>$1.</strong> ');
+  s = s.replace(/\.\s+([\d]+)\.\s+(?=[A-ZÁÉÍÓÚÂ])/g, (match, num, offset, str) => {
+    // Only treat as list item if the number is 2+ (continuation) or if preceded by "1."
+    const prevText = str.slice(0, offset);
+    if(prevText.match(/\b1\.\s+\w/) || num !== '1'){
+      return `.<br><br><strong>${num}.</strong> `;
+    }
+    return match;
+  });
+  // Restore newlines
   s = s.replace(/\n/g,'<br>');
-  // Restore math blocks
+  // Restore math
   s = s.replace(/\x00M(\d+)\x00/g, (_,i)=>mathBlocks[parseInt(i)]);
   return s;
 }
