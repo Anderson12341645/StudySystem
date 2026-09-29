@@ -1847,20 +1847,28 @@ function showEstQuestion(){
     dicaBox.textContent=q.dica_visual;
   } else dicaArea.innerHTML='';
 
-  // Body
-  document.getElementById('est-q-body').innerHTML=renderText(q.enunciado);
-  typeset(document.getElementById('est-q-body'));
+  // Body — textContent is safe (no HTML injection, spaces preserved)
+  const estQBody = document.getElementById('est-q-body');
+  estQBody.textContent = q.enunciado;
+  typeset(estQBody);
 
-  // Alternatives — rendered in shuffled display order
+  // Alternatives — use textContent via DOM manipulation (safe, no renderText)
   const dispLetters=['A','B','C','D','E'].filter(l=>estSession.displayMap[l]);
   const estAltsEl = document.getElementById('est-alts');
-  estAltsEl.innerHTML=dispLetters.map(dispL=>{
-    const origL=estSession.displayMap[dispL];
-    return `<div class="alt" id="est-alt-${dispL}" onclick="selectAlt('${dispL}')">
-      <div class="alt-letter">${dispL}</div>
-      <div class="alt-text">${renderText(q.alternativas[origL])}</div>
-    </div>`;
-  }).join('');
+  estAltsEl.innerHTML='';
+  dispLetters.forEach(dispL=>{
+    const origL = estSession.displayMap[dispL];
+    const div = document.createElement('div');
+    div.className = 'alt';
+    div.id = 'est-alt-'+dispL;
+    div.onclick = ()=>selectAlt(dispL);
+    div.innerHTML = `<div class="alt-letter">${dispL}</div>`;
+    const textDiv = document.createElement('div');
+    textDiv.className = 'alt-text';
+    textDiv.textContent = q.alternativas[origL]||'';
+    div.appendChild(textDiv);
+    estAltsEl.appendChild(div);
+  });
   typeset(estAltsEl);
 
   document.getElementById('est-confidence').style.display='none';
@@ -2158,19 +2166,26 @@ function showRevQuestion(){
     dicaBox.textContent=q.dica_visual;
   } else dicaArea.innerHTML='';
 
-  document.getElementById('rev-q-body').innerHTML=renderText(q.enunciado);
-  typeset(document.getElementById('rev-q-body'));
+  const revQBody = document.getElementById('rev-q-body');
+  revQBody.textContent = q.enunciado;
+  typeset(revQBody);
 
-  // Alternatives — shuffled display order
+  // Alternatives — safe DOM approach
   const dispLettersRev=['A','B','C','D','E'].filter(l=>revSession.displayMap[l]);
   const revAltsEl = document.getElementById('rev-alts');
-  revAltsEl.innerHTML=dispLettersRev.map(dispL=>{
-    const origL=revSession.displayMap[dispL];
-    return `<div class="alt" id="rev-alt-${dispL}" onclick="selectRevAlt('${dispL}')">
-      <div class="alt-letter">${dispL}</div>
-      <div class="alt-text">${renderText(q.alternativas[origL])}</div>
-    </div>`;
-  }).join('');
+  revAltsEl.innerHTML='';
+  dispLettersRev.forEach(dispL=>{
+    const origL = revSession.displayMap[dispL];
+    const div = document.createElement('div');
+    div.className='alt'; div.id='rev-alt-'+dispL;
+    div.onclick=()=>selectRevAlt(dispL);
+    div.innerHTML=`<div class="alt-letter">${dispL}</div>`;
+    const textDiv=document.createElement('div');
+    textDiv.className='alt-text';
+    textDiv.textContent=q.alternativas[origL]||'';
+    div.appendChild(textDiv);
+    revAltsEl.appendChild(div);
+  });
   typeset(revAltsEl);
 
   document.getElementById('rev-confidence').style.display='none';
@@ -2394,8 +2409,9 @@ function showSimQuestion(){
   document.getElementById('sim-q-header').innerHTML=
     `<span class="badge badge-gray">${q.disciplina}</span>`+
     `<span class="badge badge-gray">${q.subtopico}</span>`;
-  document.getElementById('sim-q-body').innerHTML=renderText(q.enunciado);
-  typeset(document.getElementById('sim-q-body'));
+  const simQBody = document.getElementById('sim-q-body');
+  simQBody.textContent = q.enunciado;
+  typeset(simQBody);
 
   // Shuffle alternatives and store the map for this question
   const {displayMap, origMap} = shuffleAlts(q);
@@ -2404,13 +2420,19 @@ function showSimQuestion(){
 
   const dispLettersSim=['A','B','C','D','E'].filter(l=>displayMap[l]);
   const simAltsEl = document.getElementById('sim-alts');
-  simAltsEl.innerHTML=dispLettersSim.map(dispL=>{
+  simAltsEl.innerHTML='';
+  dispLettersSim.forEach(dispL=>{
     const origL=displayMap[dispL];
-    return `<div class="alt" id="sim-alt-${dispL}" onclick="selectSimAlt('${dispL}')">
-      <div class="alt-letter">${dispL}</div>
-      <div class="alt-text">${renderText(q.alternativas[origL])}</div>
-    </div>`;
-  }).join('');
+    const div=document.createElement('div');
+    div.className='alt'; div.id='sim-alt-'+dispL;
+    div.onclick=()=>selectSimAlt(dispL);
+    div.innerHTML=`<div class="alt-letter">${dispL}</div>`;
+    const textDiv=document.createElement('div');
+    textDiv.className='alt-text';
+    textDiv.textContent=q.alternativas[origL]||'';
+    div.appendChild(textDiv);
+    simAltsEl.appendChild(div);
+  });
   typeset(simAltsEl);
   document.getElementById('sim-next-btn').disabled=true;
 }
