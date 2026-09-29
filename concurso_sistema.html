@@ -1043,10 +1043,11 @@ function renderText(t){
   s = s.replace(/\$([^$\n]+)\$/g, (_,m)=>{ mathBlocks.push('$'+m+'$'); return `\x00M${mathBlocks.length-1}\x00`; });
   // Escape HTML
   s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  // Apply markdown formatting
-  s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-  s = s.replace(/__([^_]+)__/g,'<u>$1</u>');
-  s = s.replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
+  // Apply markdown formatting — only on explicitly short spans to avoid false matches
+  s = s.replace(/\*\*([^*\n]{1,200})\*\*/g,'<strong>$1</strong>');
+  s = s.replace(/__([^_\n]{1,200})__/g,'<u>$1</u>');
+  // Italic: only match if surrounded by spaces or punctuation to avoid false positives with *
+  s = s.replace(/(^|[\s(])\*([^*\n]{1,100})\*($|[\s),.])/g,'$1<em>$2</em>$3');
   // Add line break before numbered list items ONLY when clearly a list
   // Pattern: "). N. " where N is a digit — e.g. "inicial. 2. Uma retirada"
   // Must be preceded by end of sentence (not just any period)
