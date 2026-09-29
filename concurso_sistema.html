@@ -214,10 +214,16 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 .manga-add-area input{display:none}
 @media(max-width:600px){.manga-layout{flex-direction:column}.manga-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:12px}}
 </style>
-<!-- MathJax for rendering mathematical notation ($...$) -->
+<!-- MathJax for rendering mathematical notation -->
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  tex: {
+    // Use \(...\) for inline math and \[...\] for display — avoids conflict with R$ currency
+    inlineMath: [['\\(','\\)']],
+    displayMath: [['\\[','\\]']],
+    // Also support $$ for display but NOT single $ (conflicts with R$)
+    // processEscapes: false
+  },
   options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
   startup: { ready(){ MathJax.startup.defaultReady(); } }
 };
@@ -1038,9 +1044,9 @@ function renderText(t){
   if(!t) return '';
   const mathBlocks = [];
   let s = t;
-  // Protect math blocks
-  s = s.replace(/\$\$([^$]+)\$\$/g, (_,m)=>{ mathBlocks.push('$$'+m+'$$'); return `\x00M${mathBlocks.length-1}\x00`; });
-  s = s.replace(/\$([^$\n]+)\$/g, (_,m)=>{ mathBlocks.push('$'+m+'$'); return `\x00M${mathBlocks.length-1}\x00`; });
+  // Protect math blocks — convert $...$ to \(...\) to avoid conflict with R$ currency
+  s = s.replace(/\$\$([^$]+)\$\$/g, (_,m)=>{ mathBlocks.push('\\['+m+'\\]'); return `\x00M${mathBlocks.length-1}\x00`; });
+  s = s.replace(/\$([^$\n]{1,80})\$/g, (_,m)=>{ mathBlocks.push('\\('+m+'\\)'); return `\x00M${mathBlocks.length-1}\x00`; });
   // Escape HTML
   s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   // Apply markdown formatting — only on explicitly short spans to avoid false matches
