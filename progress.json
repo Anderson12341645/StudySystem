@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "saved_at": "2026-09-29T07:00:54.760Z",
+  "saved_at": "2026-09-29T20:38:00.485Z",
   "sr_data": {
     "caf5ceb4-4d84-46ff-a591-ad5e09d1a5bc": {
       "interval_index": 4,
@@ -2083,11 +2083,11 @@
       "last_result": "confident_correct"
     },
     "c51e751b-a9e6-48f1-8493-3a0f3b9dafc1": {
-      "step": 0,
-      "next_due": "2026-09-29",
-      "last_answered": "2026-09-28",
-      "total_attempts": 3,
-      "confident_correct": 1,
+      "step": 1,
+      "next_due": "2026-10-02",
+      "last_answered": "2026-09-29",
+      "total_attempts": 4,
+      "confident_correct": 2,
       "history": [
         {
           "date": "2026-09-21",
@@ -2112,9 +2112,17 @@
           "step": 1,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-29",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "wrong"
+      "last_result": "confident_correct"
     },
     "6d936e8e-d087-4a81-8c31-2a5fd6cc5414": {
       "step": 2,
@@ -2797,11 +2805,11 @@
       "last_result": "unsure_correct"
     },
     "1105cf47-ae1b-425c-810b-406a03912fa6": {
-      "step": 0,
-      "next_due": "2026-09-29",
-      "last_answered": "2026-09-28",
-      "total_attempts": 5,
-      "confident_correct": 0,
+      "step": 1,
+      "next_due": "2026-10-02",
+      "last_answered": "2026-09-29",
+      "total_attempts": 6,
+      "confident_correct": 1,
       "history": [
         {
           "date": "2026-09-23",
@@ -2842,9 +2850,17 @@
           "step": 0,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-29",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "wrong"
+      "last_result": "confident_correct"
     },
     "3542f814-4ee2-475b-8bf9-40cef5036414": {
       "step": 2,
@@ -3790,13 +3806,21 @@
     },
     "bca98761-73ae-4cb5-b9c3-2dc617403c44": {
       "step": 0,
-      "next_due": "2026-09-29",
-      "last_answered": "2026-09-28",
-      "total_attempts": 1,
+      "next_due": "2026-09-30",
+      "last_answered": "2026-09-29",
+      "total_attempts": 2,
       "confident_correct": 0,
       "history": [
         {
           "date": "2026-09-28",
+          "confidence": "chutei",
+          "correct": false,
+          "step": 0,
+          "newStep": 0,
+          "days": 1
+        },
+        {
+          "date": "2026-09-29",
           "confidence": "chutei",
           "correct": false,
           "step": 0,
@@ -3807,11 +3831,11 @@
       "last_result": "wrong"
     },
     "9fa37bb3-4613-4442-9773-88d3f705a609": {
-      "step": 0,
-      "next_due": "2026-09-29",
-      "last_answered": "2026-09-28",
-      "total_attempts": 1,
-      "confident_correct": 0,
+      "step": 1,
+      "next_due": "2026-10-02",
+      "last_answered": "2026-09-29",
+      "total_attempts": 2,
+      "confident_correct": 1,
       "history": [
         {
           "date": "2026-09-28",
@@ -3820,9 +3844,17 @@
           "step": 0,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-29",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "wrong"
+      "last_result": "confident_correct"
     },
     "450e2f51-d5a0-4a23-935f-760153371aa3": {
       "step": 0,
@@ -3879,11 +3911,11 @@
       "last_result": "confident_correct"
     },
     "63741b75-3dac-4b9b-ad37-cf19d5cbdd9c": {
-      "step": 0,
-      "next_due": "2026-09-29",
-      "last_answered": "2026-09-28",
-      "total_attempts": 1,
-      "confident_correct": 0,
+      "step": 1,
+      "next_due": "2026-10-02",
+      "last_answered": "2026-09-29",
+      "total_attempts": 2,
+      "confident_correct": 1,
       "history": [
         {
           "date": "2026-09-28",
@@ -3892,16 +3924,24 @@
           "step": 0,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-29",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "wrong"
+      "last_result": "confident_correct"
     },
     "b2dec28a-7f03-4bdc-b70c-ddfd913771b3": {
-      "step": 0,
-      "next_due": "2026-09-29",
-      "last_answered": "2026-09-28",
-      "total_attempts": 1,
-      "confident_correct": 0,
+      "step": 1,
+      "next_due": "2026-10-02",
+      "last_answered": "2026-09-29",
+      "total_attempts": 2,
+      "confident_correct": 1,
       "history": [
         {
           "date": "2026-09-28",
@@ -3910,16 +3950,24 @@
           "step": 0,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-29",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "wrong"
+      "last_result": "confident_correct"
     },
     "9dafd486-0580-4d73-882b-71dc8143e37f": {
-      "step": 0,
-      "next_due": "2026-09-29",
-      "last_answered": "2026-09-28",
-      "total_attempts": 1,
-      "confident_correct": 0,
+      "step": 1,
+      "next_due": "2026-10-02",
+      "last_answered": "2026-09-29",
+      "total_attempts": 2,
+      "confident_correct": 1,
       "history": [
         {
           "date": "2026-09-28",
@@ -3928,9 +3976,17 @@
           "step": 0,
           "newStep": 0,
           "days": 1
+        },
+        {
+          "date": "2026-09-29",
+          "confidence": "certain",
+          "correct": true,
+          "step": 0,
+          "newStep": 1,
+          "days": 3
         }
       ],
-      "last_result": "unsure_correct"
+      "last_result": "confident_correct"
     },
     "408aefeb-a11c-4fcf-b0c8-594edbee1bc7": {
       "step": 0,
