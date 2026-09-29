@@ -86,9 +86,10 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 .empty-text{font-size:13px;line-height:1.6}
 /* QUESTION CARD */
 .q-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.q-body{font-size:15px;line-height:1.75;color:var(--text);margin-bottom:18px;padding:14px;background:var(--bg3);border-radius:var(--radius-sm);border-left:3px solid var(--blue)}
+.q-body{font-size:15px;line-height:1.8;color:var(--text);margin-bottom:18px;padding:16px 18px;background:var(--bg3);border-radius:var(--radius-sm);border-left:3px solid var(--blue);white-space:pre-line;word-break:break-word}
 /* ALTERNATIVES */
-.alt-list{display:flex;flex-direction:column;gap:8px}
+.alt-list{display:flex;flex-direction:column;gap:10px}
+.alt-text{font-size:13px;line-height:1.65;flex:1;white-space:pre-line;word-break:break-word}
 .alt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);cursor:pointer;transition:all .2s;background:var(--bg3)}
 .alt:hover:not(.disabled){border-color:var(--blue);background:var(--blue-dim)}
 .alt.selected{border-color:var(--blue);background:var(--blue-dim)}
@@ -99,7 +100,6 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 .alt.selected .alt-letter{background:var(--blue);color:#fff}
 .alt.correct .alt-letter{background:var(--green);color:#000}
 .alt.wrong .alt-letter{background:var(--red);color:#fff}
-.alt-text{font-size:13px;line-height:1.6;flex:1}
 /* CONFIDENCE */
 .confidence-row{display:flex;gap:8px;justify-content:center;margin:16px 0}
 .conf-btn{flex:1;max-width:160px;padding:10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;background:var(--bg3);color:var(--text2);text-align:center;transition:all .2s}
@@ -1037,8 +1037,6 @@ function escapeHtml(t){
 // Handles: **bold**, *italic*, __underline__, and $math$ / $$math$$
 function renderText(t){
   if(!t) return '';
-  // Escape HTML first (except we need to preserve $ for MathJax)
-  // Strategy: protect math blocks, escape HTML, restore math blocks
   const mathBlocks = [];
   let s = t;
   // Protect display math $$...$$
@@ -1051,6 +1049,12 @@ function renderText(t){
   s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
   s = s.replace(/__([^_]+)__/g,'<u>$1</u>');
   s = s.replace(/\*([^*]+)\*/g,'<em>$1</em>');
+  // Convert numbered list items to line breaks for readability
+  // e.g. "...texto. 1. Primeiro item. 2. Segundo item." → adds <br> before each number
+  s = s.replace(/\.\s+(\d+)\.\s+/g, '.<br><strong>$1.</strong> ');
+  // Also handle when they start the text
+  s = s.replace(/^(\d+)\.\s+/gm, '<strong>$1.</strong> ');
+  // Restore line breaks
   s = s.replace(/\n/g,'<br>');
   // Restore math blocks
   s = s.replace(/\x00M(\d+)\x00/g, (_,i)=>mathBlocks[parseInt(i)]);
