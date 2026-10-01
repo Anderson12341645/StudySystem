@@ -174,6 +174,21 @@ textarea.form-control{resize:vertical;min-height:70px;line-height:1.5}
 .result-circle{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;margin:0 auto 16px;border:4px solid}
 .result-pct{font-size:26px;font-weight:800}
 .result-label{font-size:11px;color:var(--text3)}
+/* DASHBOARD CHARTS */
+.day-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0}
+.day-bar-track{width:100%;height:60px;background:var(--bg3);border-radius:4px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.day-bar-fill{width:100%;background:var(--blue);border-radius:4px 4px 0 0;transition:height .3s}
+.day-bar-correct{background:var(--green)}
+.day-bar-label{font-size:9px;color:var(--text3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.day-bar-val{font-size:10px;color:var(--text2);font-weight:600;text-align:center}
+.sr-step-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sr-step-label{font-size:12px;color:var(--text2);width:60px;flex-shrink:0}
+.sr-step-bar-bg{flex:1;height:10px;background:var(--bg3);border-radius:5px;overflow:hidden}
+.sr-step-bar-fill{height:100%;border-radius:5px;transition:width .3s}
+.sr-step-count{font-size:11px;color:var(--text3);width:32px;text-align:right;flex-shrink:0}
+.first-att-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--border)}
+.first-att-row:last-child{border:none}
+@media(max-width:600px){#dash-charts-row{grid-template-columns:1fr}#dash-bottom-row{grid-template-columns:1fr}}
 /* BADGES/ACHIEVEMENTS */
 .achievement{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--radius);border:1px solid;margin-top:12px;animation:achievePop .4s ease}
 .achievement-fire{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.4)}
@@ -561,6 +576,37 @@ window.MathJax = {
     </select>
   </div>
   <div class="grid3" id="dash-stats" style="margin-bottom:20px"></div>
+
+  <!-- Weekly trend + SR distribution side by side -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px" id="dash-charts-row">
+    <div class="card" id="dash-weekly-card">
+      <div class="card-title">📈 Acurácia semanal (últimas 8 semanas)</div>
+      <div id="dash-weekly-chart" style="margin-top:8px"></div>
+    </div>
+    <div class="card" id="dash-sr-card">
+      <div class="card-title">🔁 Distribuição SR</div>
+      <div id="dash-sr-dist" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- Discipline balance + Predicted readiness -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px" id="dash-bottom-row">
+    <div class="card">
+      <div class="card-title">📚 Questões esta semana por disciplina</div>
+      <div id="dash-disc-week" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🎯 Previsão para atingir 80%</div>
+      <div id="dash-readiness" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- First-attempt accuracy -->
+  <div class="card" style="margin-bottom:20px" id="dash-first-attempt-card">
+    <div class="card-title">🎯 Taxa de primeiro acerto por disciplina</div>
+    <div id="dash-first-attempt" style="margin-top:8px"></div>
+  </div>
+
   <div class="sl">Conhecimento real por sub-tópico</div>
   <div class="note note-blue" style="margin-bottom:12px">
     <strong>Conhecimento real</strong> = acertos com confiança ÷ total tentativas. Meta: ≥80% por sub-tópico.
@@ -1562,6 +1608,10 @@ function recordQuestionAnswered(){
   const today = todayStr();
   if(s.today_date !== today){ s.today_count=0; s.today_date=today; }
   s.today_count++;
+  // Track daily log for trend charts (additive field, never erases old data)
+  if(!s.daily_log) s.daily_log = {};
+  if(!s.daily_log[today]) s.daily_log[today] = {attempted:0, correct:0, confident:0};
+  s.daily_log[today].attempted++;
   if(s.today_count === 10){
     const yesterday = addDays(today,-1);
     if(s.last_date === yesterday){ s.current++; }
@@ -1569,6 +1619,17 @@ function recordQuestionAnswered(){
     s.last_date = today;
     s.best = Math.max(s.best, s.current);
   }
+  saveStreak(s);
+}
+
+// Call after SR update to also log correct/confident to daily_log
+function recordAnswerResult(isCorrect, confidence){
+  const s = loadStreak();
+  const today = todayStr();
+  if(!s.daily_log) s.daily_log = {};
+  if(!s.daily_log[today]) s.daily_log[today] = {attempted:0, correct:0, confident:0};
+  if(isCorrect) s.daily_log[today].correct++;
+  if(isCorrect && confidence==='certain') s.daily_log[today].confident++;
   saveStreak(s);
 }
 
@@ -1959,6 +2020,7 @@ function revealEstGabarito(){
   const {srLabel,srClass}=updateSR(q.id,conf,isCorrect);
   document.getElementById('est-sr-result').innerHTML=`<div class="sr-result ${srClass}">${srLabel}</div>`;
   recordQuestionAnswered();
+  recordAnswerResult(isCorrect, conf);
 
   document.getElementById('est-gabarito').style.display='block';
   updateStatusBar();
@@ -2247,6 +2309,8 @@ function revealRevGabarito(){
   typeset(document.getElementById('rev-gab-content'));
   const {srLabel,srClass}=advanceSR(q.id,conf,isCorrect);
   document.getElementById('rev-sr-result').innerHTML=`<div class="sr-result ${srClass}">${srLabel}</div>`;
+  recordQuestionAnswered();
+  recordAnswerResult(isCorrect, conf);
 
   const notaContainer=document.getElementById('rev-nota-container');
   if(notaContainer){
@@ -2346,7 +2410,7 @@ function renderDashboard(){
 
   if(!html)html='<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">Sem dados ainda</div><div class="empty-text">Responda questões no módulo Estudar para ver seu progresso aqui.</div></div>';
 
-  // 💎 Diamond badge — all subtopics with ≥5 attempts at ≥80%
+  // 💎 Diamond badge
   if(checkDiamondBadge(filtered, sr)){
     html = `<div class="achievement achievement-diamond">
       <div class="achievement-icon">💎</div>
@@ -2356,6 +2420,152 @@ function renderDashboard(){
   }
 
   document.getElementById('dash-topics').innerHTML=html;
+
+  // ── #1 WEEKLY ACCURACY TREND (last 8 weeks) ─────────────────────
+  const streak = loadStreak();
+  const dailyLog = streak.daily_log || {};
+  const todayW = todayStr();
+
+  // Build weekly buckets
+  const weeks = [];
+  for(let w=7;w>=0;w--){
+    const weekStart = addDays(todayW, -(w*7+6));
+    const weekEnd   = addDays(todayW, -(w*7));
+    let wAtt=0, wCor=0;
+    for(let d=0;d<7;d++){
+      const day = addDays(weekStart, d);
+      const log = dailyLog[day]||{attempted:0,correct:0};
+      wAtt += log.attempted||0;
+      wCor += log.correct||0;
+    }
+    const weekLabel = weekEnd.slice(5); // MM-DD of last day of week
+    weeks.push({label:weekLabel, att:wAtt, cor:wCor, pct: wAtt>0?Math.round((wCor/wAtt)*100):null});
+  }
+  const maxWeekAtt = Math.max(1, ...weeks.map(w=>w.att));
+
+  const weeklyHtml = `
+    <div style="display:flex;gap:6px;align-items:flex-end;height:80px;margin-bottom:4px">
+      ${weeks.map(w=>{
+        const barH = w.att>0 ? Math.max(4, Math.round((w.att/maxWeekAtt)*64)) : 0;
+        const color = w.pct===null?'var(--text3)':w.pct>=80?'var(--green)':w.pct>=50?'var(--amber)':'var(--red)';
+        const pctLabel = w.pct !== null ? w.pct+'%' : '';
+        return `<div class="day-bar-wrap" title="Semana até ${w.label}: ${w.att} tentativas, ${w.pct!==null?w.pct+'% corretas':'sem dados'}">
+          <div class="day-bar-val" style="color:${color}">${pctLabel}</div>
+          <div class="day-bar-track">
+            <div style="height:${barH}px;width:100%;background:${color};border-radius:4px 4px 0 0;opacity:${w.att>0?'1':'0.2'}"></div>
+          </div>
+          <div class="day-bar-label">${w.label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--text3)">Cada barra = 1 semana. Cor = % de acertos. Dados a partir de hoje.</div>`;
+  document.getElementById('dash-weekly-chart').innerHTML = weeklyHtml;
+
+  // ── #3 SR STEP DISTRIBUTION ──────────────────────────────────────
+  const stepLabels = ['Nunca visto','D+1 (recente)','D+3','D+7','D+15','D+30+ (dominado)'];
+  const stepColors = ['var(--text3)','var(--red)','var(--amber)','var(--blue)','var(--purple)','var(--green)'];
+  const stepCounts = [0,0,0,0,0,0];
+  filtered.forEach(q=>{
+    const d = sr[q.id];
+    if(!d || !d.total_attempts){ stepCounts[0]++; }
+    else { stepCounts[Math.min(d.step||0, 5)]++; }
+  });
+  const totalSR = filtered.length;
+  const srHtml = stepLabels.map((label,i)=>{
+    const count = stepCounts[i];
+    const pct = totalSR>0 ? Math.round((count/totalSR)*100) : 0;
+    return `<div class="sr-step-row">
+      <div class="sr-step-label" style="color:${stepColors[i]};width:110px">${label}</div>
+      <div class="sr-step-bar-bg"><div class="sr-step-bar-fill" style="width:${pct}%;background:${stepColors[i]}"></div></div>
+      <div class="sr-step-count">${count}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('dash-sr-dist').innerHTML = srHtml ||
+    '<div style="font-size:12px;color:var(--text3)">Responda questões para ver a distribuição.</div>';
+
+  // ── #4 QUESTIONS PER DISCIPLINE THIS WEEK ───────────────────────
+  const weekStart7 = addDays(todayW, -6);
+  const discWeek = {};
+  // Use history to count questions answered in last 7 days
+  filtered.forEach(q=>{
+    const d = sr[q.id];
+    if(!d || !d.history) return;
+    const thisWeek = d.history.filter(h=>h.date>=weekStart7).length;
+    if(thisWeek>0){
+      if(!discWeek[q.disciplina]) discWeek[q.disciplina]=0;
+      discWeek[q.disciplina]+=thisWeek;
+    }
+  });
+  const maxDiscWeek = Math.max(1, ...Object.values(discWeek));
+  const discWeekHtml = Object.entries(discWeek).length>0 ?
+    Object.entries(discWeek).sort((a,b)=>b[1]-a[1]).map(([disc,count])=>{
+      const pct = Math.round((count/maxDiscWeek)*100);
+      const color = count>=20?'var(--green)':count>=10?'var(--amber)':'var(--red)';
+      return `<div class="first-att-row">
+        <div style="flex:1;font-size:12px;color:var(--text)">${disc}</div>
+        <div class="topic-bar-bg" style="width:80px"><div class="topic-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div style="font-size:12px;font-weight:700;color:${color};width:30px;text-align:right">${count}</div>
+      </div>`;
+    }).join('') :
+    '<div style="font-size:12px;color:var(--text3)">Dados a partir de hoje. Volte amanhã para ver o balanço semanal.</div>';
+  document.getElementById('dash-disc-week').innerHTML = discWeekHtml;
+
+  // ── #6 PREDICTED READINESS ───────────────────────────────────────
+  // For each subtopic: current %, questions answered, estimate days to 80%
+  const readinessData = [];
+  Object.values(subtopics).forEach(s=>{
+    if(s.att < 3) return; // need at least 3 attempts to predict
+    const currentPct = s.att>0 ? Math.round((s.conf/s.att)*100) : 0;
+    if(currentPct >= 80) return; // already done
+    const gap = 80 - currentPct;
+    // Rate: confident_correct per attempt over last N answers (from history)
+    // Simple estimate: if adding ~1 confident correct per X attempts, how many more needed?
+    const confNeeded = Math.ceil((0.80 * s.att) - s.conf); // additional confident corrects needed
+    const recentRate = s.att>0 ? (s.conf/s.att) : 0.3;
+    const attNeeded = recentRate>0 ? Math.ceil(confNeeded/recentRate) : 999;
+    const daysNeeded = Math.ceil(attNeeded/20); // assuming 20 questions/day
+    readinessData.push({sub:s.sub, disc:s.disc, currentPct, gap, daysNeeded, att:s.att});
+  });
+  readinessData.sort((a,b)=>a.daysNeeded-b.daysNeeded);
+
+  const readinessHtml = readinessData.length>0 ?
+    readinessData.slice(0,6).map(r=>{
+      const color = r.daysNeeded<=7?'var(--green)':r.daysNeeded<=21?'var(--amber)':'var(--red)';
+      const label = r.daysNeeded<=1?'Hoje!':r.daysNeeded<=7?`~${r.daysNeeded} dias`:`~${r.daysNeeded} dias`;
+      return `<div class="first-att-row">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.sub}</div>
+          <div style="font-size:10px;color:var(--text3)">${r.currentPct}% atual → 80% meta · ${r.att} tentativas</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:${color};white-space:nowrap;margin-left:8px">${label}</div>
+      </div>`;
+    }).join('') + (readinessData.length>6?`<div style="font-size:11px;color:var(--text3);margin-top:6px">+${readinessData.length-6} sub-tópicos mais...</div>`:'') :
+    '<div style="font-size:12px;color:var(--text3)">Responda pelo menos 3 questões por sub-tópico para ver a previsão.</div>';
+  document.getElementById('dash-readiness').innerHTML = readinessHtml;
+
+  // ── #2 FIRST-ATTEMPT ACCURACY BY DISCIPLINE ──────────────────────
+  const discFirst = {};
+  filtered.forEach(q=>{
+    const d = sr[q.id];
+    if(!d || !d.history || d.history.length===0) return;
+    const first = d.history[0];
+    const disc = q.disciplina;
+    if(!discFirst[disc]) discFirst[disc]={att:0,correct:0};
+    discFirst[disc].att++;
+    if(first.correct) discFirst[disc].correct++;
+  });
+  const faHtml = Object.entries(discFirst).sort((a,b)=>b[1].att-a[1].att).map(([disc,d])=>{
+    const pct = d.att>0 ? Math.round((d.correct/d.att)*100) : 0;
+    const color = pct>=70?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    return `<div class="first-att-row">
+      <div style="flex:1;font-size:13px;color:var(--text)">${disc}</div>
+      <div style="font-size:12px;color:var(--text3);margin-right:10px">${d.correct}/${d.att}</div>
+      <div class="topic-bar-bg" style="width:80px"><div class="topic-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div style="font-size:13px;font-weight:700;color:${color};width:38px;text-align:right">${pct}%</div>
+    </div>`;
+  }).join('');
+  document.getElementById('dash-first-attempt').innerHTML = faHtml ||
+    '<div style="font-size:12px;color:var(--text3)">Dados insuficientes. Continue respondendo questões.</div>';
 }
 
 // ═══════════════════════════════════════════════════════════════════
