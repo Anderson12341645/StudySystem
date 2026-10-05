@@ -1842,12 +1842,11 @@ function startEstudar(){
       return bErr-aErr;
     });
   } else if(ordem==='nunca'){
+    // "Nunca respondidas" = never-answered questions FIRST, ignore SR overdue priority
     qs=[...qs].sort((a,b)=>{
-      const gDiff=srGroup(a)-srGroup(b);
-      if(gDiff!==0) return gDiff;
       const aNever=!sr[a.id]||!sr[a.id].total_attempts?0:1;
       const bNever=!sr[b.id]||!sr[b.id].total_attempts?0:1;
-      return aNever-bNever;
+      return aNever-bNever; // 0 (never) before 1 (already answered)
     });
   }
 
