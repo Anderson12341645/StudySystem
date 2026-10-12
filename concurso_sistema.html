@@ -3304,9 +3304,11 @@ async function syncWithGitHub(){
       await pushToGitHub(payload);
       // Push nota images to GitHub
       const imgCount = await pushNotaImagesToGitHub(token);
+      const mangaCount = await pushMangaTabImagesToGitHub(token);
       localStorage.setItem(SYNC_TS_KEY, new Date().toISOString());
       setSyncBtn('ok');
-      showToast(`☁️ Progresso salvo! ${imgCount>0?imgCount+' imagem(ns) sincronizada(s)':''}`);
+      const total = (imgCount||0)+(mangaCount||0);
+      showToast(`☁️ Progresso salvo! ${total>0?total+' imagem(ns) sincronizada(s)':''}`);
     } else {
       // PULL — progress + images
       setSyncBtn('loading');
@@ -3324,9 +3326,11 @@ async function syncWithGitHub(){
       applyProgress(payload);
       // Pull nota images from GitHub
       const imgCount = await pullNotaImagesFromGitHub(token);
+      const mangaCount = await pullMangaTabImagesFromGitHub(token);
       localStorage.setItem(SYNC_TS_KEY, payload.saved_at||new Date().toISOString());
       setSyncBtn('ok');
-      showToast(`☁️ Progresso carregado! ${imgCount>0?imgCount+' imagem(ns) baixada(s)':''}`);
+      const total = (imgCount||0)+(mangaCount||0);
+      showToast(`☁️ Progresso carregado! ${total>0?total+' imagem(ns) baixada(s)':''}`);
       updateStatusBar();
       renderRevHome();
       renderDashboard();
@@ -3501,6 +3505,78 @@ async function pullNotaImagesFromGitHub(token){
   if(newKeys.length>0) addToNotaSyncedSet(newKeys);
   return downloaded;
 }
+
+// ── Manga Tab image sync via GitHub API ──────────────────────────────
+const MANGA_SYNC_KEY = 'cq_manga_tab_synced';
+function getMangaSyncedSet(){ try{return new Set(JSON.parse(localStorage.getItem(MANGA_SYNC_KEY)||'[]'));}catch(_){return new Set();} }
+function addToMangaSyncedSet(keys){ const s=getMangaSyncedSet(); keys.forEach(k=>s.add(k)); localStorage.setItem(MANGA_SYNC_KEY,JSON.stringify([...s])); }
+
+async function getAllMangaTabImages(){
+  const db=await openMangaDB();
+  return new Promise(res=>{
+    const all=[],req=db.transaction(MANGA_IMG_STORE,'readonly').objectStore(MANGA_IMG_STORE).openCursor();
+    req.onsuccess=e=>{const c=e.target.result;if(c){all.push(c.value);c.continue();}else res(all);};
+    req.onerror=()=>res([]);
+  });
+}
+
+async function pushMangaTabImagesToGitHub(token){
+  const imgs=await getAllMangaTabImages();
+  if(!imgs.length) return 0;
+  const synced=getMangaSyncedSet();
+  const toSync=imgs.filter(img=>!synced.has(`${img.mangaId}_${img.idx}`));
+  if(!toSync.length) return 0;
+  showToast(`⏳ Enviando ${toSync.length} manga(s) para GitHub...`);
+  let pushed=0; const newKeys=[];
+  for(const img of toSync){
+    try{
+      const key=`${img.mangaId}_${img.idx}`;
+      const url=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/manga_tab/${key}.jpg`;
+      const base64=img.dataUrl.replace(/^data:[^;]+;base64,/,'');
+      let sha=null;
+      try{const c=await fetch(url,{headers:{Authorization:`token ${token}`,Accept:'application/vnd.github.v3+json'}});if(c.ok){const d=await c.json();sha=d.sha;}}catch(_){}
+      const body={message:`manga ${key}`,content:base64};
+      if(sha) body.sha=sha;
+      const resp=await fetch(url,{method:'PUT',headers:{Authorization:`token ${token}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(resp.ok){newKeys.push(key);pushed++;}
+    }catch(e){console.warn('push manga failed:',e.message);}
+  }
+  if(newKeys.length) addToMangaSyncedSet(newKeys);
+  return pushed;
+}
+
+async function pullMangaTabImagesFromGitHub(token){
+  const listUrl=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/manga_tab`;
+  let files=[];
+  try{const r=await fetch(listUrl+'?t='+Date.now(),{headers:{Authorization:`token ${token}`,Accept:'application/vnd.github.v3+json'}});if(!r.ok)return 0;files=await r.json();}catch(_){return 0;}
+  if(!Array.isArray(files)||!files.length) return 0;
+  const existing=await getAllMangaTabImages();
+  const existingKeys=new Set(existing.map(i=>`${i.mangaId}_${i.idx}`));
+  const toDownload=files.filter(f=>f.name.endsWith('.jpg')&&!existingKeys.has(f.name.replace('.jpg','')));
+  if(!toDownload.length) return 0;
+  showToast(`⏳ Baixando ${toDownload.length} manga(s) do GitHub...`);
+  let downloaded=0; const newKeys=[];
+  const db=await openMangaDB();
+  for(const file of toDownload){
+    try{
+      const resp=await fetch(file.download_url);
+      if(!resp.ok) continue;
+      const blob=await resp.blob();
+      const dataUrl=await new Promise(res=>{const fr=new FileReader();fr.onload=e=>res(e.target.result);fr.readAsDataURL(blob);});
+      const keyPart=file.name.replace('.jpg','');
+      const lastU=keyPart.lastIndexOf('_');
+      const mangaId=keyPart.slice(0,lastU);
+      const idx=parseInt(keyPart.slice(lastU+1));
+      if(!mangaId||isNaN(idx)) continue;
+      await new Promise((res,rej)=>{const tx=db.transaction(MANGA_IMG_STORE,'readwrite');tx.objectStore(MANGA_IMG_STORE).put({key:keyPart,mangaId,idx,dataUrl,name:file.name});tx.oncomplete=res;tx.onerror=e=>rej(e.target.error);});
+      const meta=loadMangaMeta();const entry=meta.find(m=>m.id===mangaId);
+      if(entry){const allImgs=await mangaGetImages(mangaId);entry.imgCount=allImgs.length;saveMangaMeta(meta);}
+      newKeys.push(keyPart);downloaded++;
+    }catch(e){console.warn('pull manga failed:',file.name,e.message);}
+  }
+  if(newKeys.length) addToMangaSyncedSet(newKeys);
+  return downloaded;
+}
 // ─────────────────────────────────────────────────────────────────────
 
 // Auto-pull on load if we've never synced on this device
@@ -3516,9 +3592,12 @@ async function autoSyncOnLoad(){
       updateStatusBar();
       renderRevHome();
     }
-    // Also pull nota images silently
+    // Also pull nota images and manga tab images silently
     const token = getGHToken();
-    if(token) pullNotaImagesFromGitHub(token).catch(_=>{});
+    if(token){
+      pullNotaImagesFromGitHub(token).catch(_=>{});
+      pullMangaTabImagesFromGitHub(token).catch(_=>{});
+    }
   } catch(_){ /* no progress.json yet — that's fine */ }
 }
 // ─────────────────────────────────────────────────────────────────────
